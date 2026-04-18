@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+venv/
+env/
+.venv/
+
+# Build output
+dist/
+build/
+out/
+*.exe
+*.msi
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Electron
+.electron/
+.webpack/
+
+# Runtime
+.cache/
+.parcel-cache/
+.vite/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temp
+*.tmp
+*.bak
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# devIdeTool runtime
+config.local.json
+session-state.json

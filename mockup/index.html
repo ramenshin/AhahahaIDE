@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>devIdeTool — UI Mockup v2</title>
+<style>
+  :root {
+    --bg-0: #1e1e2e;
+    --bg-1: #252535;
+    --bg-2: #2a2a3d;
+    --bg-hover: #34344a;
+    --bg-active: #3d3d5c;
+    --border: #3a3a4e;
+    --text-0: #e4e4ef;
+    --text-1: #a0a0b8;
+    --text-2: #6a6a85;
+    --accent: #89b4fa;
+    --accent-bright: #b4d2ff;
+    --green: #a6e3a1;
+    --yellow: #f9e2af;
+    --red: #f38ba8;
+    --gray: #6c7086;
+    --mauve: #cba6f7;
+    --orange: #fab387;
+    --teal: #94e2d5;
+    --pink: #f5c2e7;
+
+    /* === 색상 스킴 변수 (기본 = D 틸 그린) === */
+    --top-bar-bg: #1a1f24;
+    --tabs-row-bg: #0f2a30;
+    --tab-inactive-bg: #143a42;
+    --tab-hover-bg: #1e5260;
+    --tab-active-bg: #1e4b55;
+    --tab-active-accent: #94e2d5;
+    --tab-border: #0a1f24;
+  }
+
+  /* Scheme A — 스왑 (퍼플 위 / 블루그레이 아래) */
+  body.scheme-a {
+    --top-bar-bg: #1a1626;
+    --tabs-row-bg: #2a2b3d;
+    --tab-inactive-bg: #323648;
+    --tab-hover-bg: #424660;
+    --tab-active-bg: #3d4060;
+    --tab-active-accent: #89b4fa;
+    --tab-border: #1f2230;
+  }
+  /* Scheme B — VS Code 활동바 */
+  body.scheme-b {
+    --top-bar-bg: #181825;
+    --tabs-row-bg: #252540;
+    --tab-inactive-bg: #2d2d48;
+    --tab-hover-bg: #3a3a5a;
+    --tab-active-bg: #3d3a5e;
+    --tab-active-accent: #cba6f7;
+    --tab-border: #2a2540;
+  }
+  /* Scheme C — 미드나잇 블루 */
+  body.scheme-c {
+    --top-bar-bg: #0f1729;
+    --tabs-row-bg: #1e2a4a;
+    --tab-inactive-bg: #263459;
+    --tab-hover-bg: #324373;
+    --tab-active-bg: #334a7a;
+    --tab-active-accent: #74c7ec;
+    --tab-border: #172039;
+  }
+  /* Scheme D — 틸 그린 (기본값) */
+  /* Scheme E — Dracula */
+  body.scheme-e {
+    --top-bar-bg: #1e1f29;
+    --tabs-row-bg: #282a36;
+    --tab-inactive-bg: #343746;
+    --tab-hover-bg: #44475a;
+    --tab-active-bg: #44475a;
+    --tab-active-accent: #ff79c6;
+    --tab-border: #22232e;
+  }
+  /* Scheme F — One Dark (Atom/VS Code) */
+  body.scheme-f {
+    --top-bar-bg: #1e222a;
+    --tabs-row-bg: #282c34;
+    --tab-inactive-bg: #353b45;
+    --tab-hover-bg: #4b5263;
+    --tab-active-bg: #3e4452;
+    --tab-active-accent: #61afef;
+    --tab-border: #21252b;
+  }
+  /* Scheme G — Solarized Dark */
+  body.scheme-g {
+    --top-bar-bg: #002b36;
+    --tabs-row-bg: #073642;
+    --tab-inactive-bg: #0f4452;
+    --tab-hover-bg: #1e5b6e;
+    --tab-active-bg: #1b5b6e;
+    --tab-active-accent: #268bd2;
+    --tab-border: #003847;
+  }
+  /* Scheme H — Gruvbox Dark */
+  body.scheme-h {
+    --top-bar-bg: #1d2021;
+    --tabs-row-bg: #282828;
+    --tab-inactive-bg: #3c3836;
+    --tab-hover-bg: #504945;
+    --tab-active-bg: #504945;
+    --tab-active-accent: #fabd2f;
+    --tab-border: #1d2021;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--bg-0);
+    color: var(--text-0);
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    font-size: 13px;
+    user-select: none;
+  }
+
+  /* === APP SHELL === */
+  .app {
+    display: grid;
+    grid-template-rows: 32px 34px 1fr 24px;
+    height: 100vh;
+  }
+
+  /* === TOP BAR === */
+  .top-bar {
+    background: var(--top-bar-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .top-bar .app-title {
+    font-weight: 600;
+    color: var(--accent);
+    margin-right: 16px;
+    font-size: 13px;
+  }
+  .top-bar .btn {
+    background: transparent;
+    border: none;
+    color: var(--text-1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .top-bar .btn:hover { background: var(--bg-hover); color: var(--text-0); }
+  .top-bar .spacer { flex: 1; }
+  .top-bar .kbd {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-family: monospace;
+    color: var(--text-2);
+    margin-left: 4px;
+  }
+
+  /* === PROJECT TAB BAR === */
+  .project-tabs {
+    background: var(--tabs-row-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .project-tab {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    height: 100%;
+    border-right: 1px solid var(--tab-border);
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-1);
+    min-width: 140px;
+    max-width: 220px;
+    background: var(--tab-inactive-bg);
+  }
+  .project-tab:hover { background: var(--tab-hover-bg); }
+  .project-tab.active {
+    background: var(--tab-active-bg);
+    color: #ffffff;
+    border-top: 2px solid var(--tab-active-accent);
+    padding-top: 0;
+    font-weight: 600;
+    box-shadow: 0 -1px 0 var(--tab-active-accent);
+  }
+  .project-tab .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .project-tab .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .project-tab .dot.running { background: var(--green); }
+  .project-tab .dot.hibernate { background: var(--yellow); }
+  .project-tab .dot.error { background: var(--red); }
+  .project-tab .badge {
+    background: var(--red);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 8px;
+    min-width: 16px;
+    text-align: center;
+  }
+  .project-tab .close {
+    color: var(--text-2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px;
+    border-radius: 2px;
+  }
+  .project-tab .close:hover { background: var(--bg-active); color: var(--text-0); }
+  .project-tab.active .close { color: var(--text-1); }
+  .project-tab .dirty { color: var(--orange); font-size: 10px; }
+  .tab-add {
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    color: var(--text-2);
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .tab-add:hover { color: var(--text-0); background: var(--bg-hover); }
+
+  /* === MAIN === */
+  .main {
+    display: grid;
+    grid-template-columns: minmax(420px, 520px) 4px 1fr;
+    overflow: hidden;
+  }
+  .resizer-v {
+    background: var(--border);
+    cursor: col-resize;
+  }
+  .resizer-v:hover { background: var(--accent); }
+  .resizer-h {
+    background: var(--border);
+    cursor: row-resize;
+  }
+  .resizer-h:hover { background: var(--accent); }
+
+  /* === LEFT AREA === */
+  .left-area {
+    display: grid;
+    grid-template-rows: 7fr 4px 3fr;
+    overflow: hidden;
+  }
+  .left-top {
+    display: grid;
+    grid-template-columns: 220px 4px 1fr;
+    overflow: hidden;
+  }
+
+  /* === PANEL HEADER === */
+  .panel-header {
+    background: var(--bg-1);
+    color: var(--text-1);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 28px;
+    flex-shrink: 0;
+  }
+  .panel-header .title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .panel-header .actions { display: flex; gap: 2px; }
+  .panel-header .actions button {
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 5px;
+    border-radius: 3px;
+  }
+  .panel-header .actions button:hover { background: var(--bg-hover); color: var(--text-0); }
+
+  /* === PANEL: PROJECT FOLDERS === */
+  .panel-folders {
+    background: var(--bg-1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .panel-folders .content { overflow-y: auto; flex: 1; padding: 4px 0; }
+  .section-title {
+    color: var(--text-2);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 10px 2px;
+  }
+  .folder-item {
+    display: flex;
+    align-items: center;
+    padding: 3px 10px;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-1);
+    border-left: 2px solid transparent;
+  }
+  .folder-item:hover { background: var(--bg-hover); }
+  .folder-item.active {
+    background: var(--bg-active);
+    color: var(--accent-bright);
+    border-left-color: var(--accent);
+  }
+  .folder-item.opened { color: var(--accent-bright); font-weight: 500; }
+  .folder-item .icon-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .folder-item .icon-status.running { background: var(--green); box-shadow: 0 0 4px var(--green); }
+  .folder-item .icon-status.hibernate { background: var(--yellow); }
+  .folder-item .icon-status.error { background: var(--red); }
+  .folder-item .icon-status.idle { background: var(--gray); opacity: 0.4; }
+  .folder-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+  .folder-item .pin { color: var(--orange); font-size: 10px; }
+
+  /* === PANEL: FILES === */
+  .panel-files {
+    background: var(--bg-1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .panel-files .search {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .panel-files .search input {
+    width: 100%;
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    color: var(--text-0);
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    outline: none;
+  }
+  .panel-files .search input:focus { border-color: var(--accent); }
+  .panel-files .content { overflow-y: auto; flex: 1; padding: 3px 0; }
+  .file-item {
+    display: flex;
+    align-items: center;
+    padding: 2px 10px;
+    gap: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-1);
+  }
+  .file-item:hover { background: var(--bg-hover); color: var(--text-0); }
+  .file-item.folder { color: var(--text-0); }
+  .file-item.selected { background: var(--bg-active); color: var(--accent-bright); }
+  .file-item .caret { width: 10px; color: var(--text-2); font-size: 9px; }
+  .file-item .file-icon { width: 14px; text-align: center; font-size: 11px; }
+  .file-item.indent-1 { padding-left: 22px; }
+  .file-item.indent-2 { padding-left: 34px; }
+  .file-item.indent-3 { padding-left: 46px; }
+  .file-icon.py { color: #3776ab; }
+  .file-icon.ts { color: #3178c6; }
+  .file-icon.folder { color: var(--orange); }
+
+  /* === PANEL: MEMO === */
+  .panel-memo {
+    background: var(--bg-1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .memo-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--border);
+    gap: 4px;
+    background: var(--bg-2);
+    flex-shrink: 0;
+  }
+  .memo-toolbar .seg {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .memo-toolbar .seg button {
+    background: transparent;
+    border: none;
+    color: var(--text-1);
+    padding: 3px 10px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .memo-toolbar .seg button.active {
+    background: var(--accent);
+    color: var(--bg-0);
+    font-weight: 600;
+  }
+  .memo-toolbar .btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .memo-toolbar .btn:hover { background: var(--bg-hover); color: var(--text-0); }
+  .memo-toolbar .status {
+    font-size: 10px;
+    color: var(--text-2);
+    margin-left: auto;
+  }
+  .memo-toolbar .status .saved { color: var(--green); }
+  .memo-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 14px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-0);
+    background: var(--bg-1);
+  }
+  .memo-body .md-h { color: var(--accent-bright); font-weight: 600; }
+  .memo-body .md-bullet { color: var(--teal); }
+  .memo-body .md-code { color: var(--mauve); background: var(--bg-2); padding: 1px 4px; border-radius: 2px; }
+  .memo-body .md-todo-done { color: var(--text-2); text-decoration: line-through; }
+  .memo-body .md-todo { color: var(--yellow); }
+
+  /* === RIGHT AREA === */
+  .right-area {
+    display: grid;
+    grid-template-rows: 4fr 4px 3fr 4px 3fr;
+    overflow: hidden;
+  }
+
+  /* === PANEL: EDITOR === */
+  .panel-editor {
+    background: #151521;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .editor-tabs {
+    display: flex;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    flex-shrink: 0;
+    height: 28px;
+    align-items: center;
+  }
+  .editor-tab {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 6px;
+    height: 100%;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--text-1);
+  }
+  .editor-tab.active { background: #151521; color: var(--text-0); border-bottom: 2px solid var(--accent); }
+  .editor-tab .dirty { color: var(--orange); font-size: 11px; }
+  .editor-tab .close { color: var(--text-2); font-size: 13px; padding: 0 2px; }
+  .editor-tab .close:hover { color: var(--text-0); background: var(--bg-active); border-radius: 2px; }
+  .breadcrumb {
+    background: #151521;
+    color: var(--text-2);
+    font-size: 10px;
+    padding: 3px 12px;
+    border-bottom: 1px solid var(--border);
+    font-family: monospace;
+    flex-shrink: 0;
+  }
+  .breadcrumb .sep { margin: 0 4px; opacity: 0.5; }
+  .breadcrumb .current { color: var(--text-1); }
+  .editor-body {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    background: #151521;
+  }
+  .line-numbers {
+    background: #151521;
+    color: var(--text-2);
+    padding: 8px 10px 8px 14px;
+    text-align: right;
+    user-select: none;
+    border-right: 1px solid var(--border);
+    min-width: 40px;
+  }
+  .line-numbers div { height: 1.5em; }
+  .line-numbers div.active { color: var(--accent); }
+  .code {
+    padding: 8px 14px;
+    flex: 1;
+    white-space: pre;
+    color: var(--text-0);
+  }
+  .code .kw { color: var(--mauve); }
+  .code .fn { color: var(--accent); }
+  .code .str { color: var(--green); }
+  .code .num { color: var(--orange); }
+  .code .comment { color: var(--text-2); font-style: italic; }
+  .code .cls { color: var(--yellow); }
+  .code .self { color: var(--pink); }
+  .code .active-line { background: rgba(137, 180, 250, 0.08); }
+
+  /* === PANEL: TERMINAL === */
+  .panel-terminal {
+    background: #0f0f1a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .panel-terminal.focused { box-shadow: inset 2px 0 0 var(--accent); }
+  .terminal-label {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    background: var(--bg-2);
+    color: var(--text-2);
+    font-size: 10px;
+    font-family: monospace;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .panel-terminal.focused .terminal-label { color: var(--accent-bright); border-color: var(--accent); }
+  .terminal {
+    flex: 1;
+    background: #0f0f1a;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 12px;
+    padding: 10px 14px;
+    overflow-y: auto;
+    line-height: 1.5;
+    color: #e4e4ef;
+  }
+  .terminal .prompt { color: var(--green); }
+  .terminal .path { color: var(--accent); }
+  .terminal .info { color: var(--text-2); }
+  .terminal .highlight { color: var(--mauve); }
+  .terminal .success { color: var(--green); }
+  .terminal .warn { color: var(--yellow); }
+  .terminal .error { color: var(--red); }
+  .terminal .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 14px;
+    background: var(--text-0);
+    vertical-align: text-bottom;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* === STATUS BAR === */
+  .statusbar {
+    background: var(--accent);
+    color: #1e1e2e;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 11px;
+    gap: 14px;
+    font-weight: 500;
+  }
+  .statusbar .sep { opacity: 0.4; }
+  .statusbar .item { display: flex; align-items: center; gap: 4px; }
+  .statusbar .spacer { flex: 1; }
+
+  /* === SCHEME SWITCHER (목업 전용 - 실제 앱에는 없음) === */
+  .scheme-switcher {
+    position: fixed;
+    top: 48px;
+    right: 12px;
+    background: rgba(15, 15, 25, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 1000;
+    font-size: 11px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .scheme-switcher .ss-title {
+    color: var(--text-2);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 2px;
+  }
+  .scheme-switcher .ss-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+    min-width: 140px;
+  }
+  .scheme-switcher .ss-btn:hover { background: var(--bg-hover); color: var(--text-0); }
+  .scheme-switcher .ss-btn.active {
+    background: var(--accent);
+    color: var(--bg-0);
+    font-weight: 600;
+    border-color: var(--accent);
+  }
+  .scheme-switcher .ss-dots { display: inline-flex; gap: 2px; }
+  .scheme-switcher .ss-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--bg-active); }
+</style>
+</head>
+<body class="scheme-d">
+
+<!-- THEME PREVIEW (목업 전용, 실제 앱에서는 설정 → 테마 메뉴에서 선택) -->
+<div class="scheme-switcher">
+  <div class="ss-title">🎨 테마 프리셋 (설정 → 테마)</div>
+  <button class="ss-btn" data-scheme="a">
+    <span class="ss-dots">
+      <span class="ss-dot" style="background:#1a1626"></span>
+      <span class="ss-dot" style="background:#2a2b3d"></span>
+      <span class="ss-dot" style="background:#3d4060"></span>
+    </span>
+    A · 스왑 (퍼플/블루)
+  </button>
+  <button class="ss-btn" data-scheme="b">
+    <span class="ss-dots">
+      <span class="ss-dot" style="background:#181825"></span>
+      <span class="ss-dot" style="background:#252540"></span>
+      <span class="ss-dot" style="background:#3d3a5e"></span>
+    </span>
+    B · VS Code 활동바
+  </button>
+  <button class="ss-btn" data-scheme="c">
+    <span class="ss-dots">
+      <span class="ss-dot" style="background:#0f1729"></span>
+      <span class="ss-dot" style="background:#1e2a4a"></span>
+      <span class="ss-dot" style="background:#334a7a"></span>
+    </span>
+    C · 미드나잇 블루
+  </button>
+  <button class="ss-btn active" data-scheme="d">
+    <span class="ss-dots">
+      <span class="ss-dot" style="background:#1a1f24"></span>
+      <span class="ss-dot" style="background:#0f2a30"></span>
+      <span class="ss-dot" style="background:#1e4b55"></span>
+    </span>
+    D · 틸 그린 ★기본
+  </button>
+  <button class="ss-btn" data-scheme="e">
+    <span class="ss-dots">
+      <span class="ss-dot" style="background:#1e1f29"></span>
+      <span class="ss-dot" style="background:#282a36"></span>
+      <span class="ss-dot" style="background:#44475a"></span>
+    </span>
+    E · Dracula
+  </button>
+  <button class="ss-btn" data-scheme="f">
+    <span class="ss-dots">
+      <span class="ss-dot" style="background:#1e222a"></span>
+      <span class="ss-dot" style="background:#282c34"></span>
+      <span class="ss-dot" style="background:#3e4452"></span>
+    </span>
+    F · One Dark
+  </button>
+  <button class="ss-btn" data-scheme="g">
+    <span class="ss-dots">
+      <span class="ss-dot" style="background:#002b36"></span>
+      <span class="ss-dot" style="background:#073642"></span>
+      <span class="ss-dot" style="background:#1b5b6e"></span>
+    </span>
+    G · Solarized Dark
+  </button>
+  <button class="ss-btn" data-scheme="h">
+    <span class="ss-dots">
+      <span class="ss-dot" style="background:#1d2021"></span>
+      <span class="ss-dot" style="background:#282828"></span>
+      <span class="ss-dot" style="background:#504945"></span>
+    </span>
+    H · Gruvbox Dark
+  </button>
+</div>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="app-title">⚡ devIdeTool</div>
+    <button class="btn">+ 새 폴더</button>
+    <button class="btn">⚙ 설정</button>
+    <div class="spacer"></div>
+    <button class="btn">Quick Switch <span class="kbd">Ctrl+P</span></button>
+    <button class="btn">명령 팔레트 <span class="kbd">Ctrl+Shift+P</span></button>
+  </div>
+
+  <!-- PROJECT TAB BAR -->
+  <div class="project-tabs">
+    <div class="project-tab active">
+      <span class="dot running"></span>
+      <span class="name">Ytb_HotNews</span>
+      <span class="dirty">●</span>
+      <span class="close">×</span>
+    </div>
+    <div class="project-tab">
+      <span class="dot running"></span>
+      <span class="name">check-pc-status</span>
+      <span class="badge">3</span>
+      <span class="close">×</span>
+    </div>
+    <div class="project-tab">
+      <span class="dot hibernate"></span>
+      <span class="name">Ytb_MusicVideo</span>
+      <span class="close">×</span>
+    </div>
+    <div class="project-tab">
+      <span class="dot running"></span>
+      <span class="name">Ytb_HotNews2</span>
+      <span class="badge">12</span>
+      <span class="close">×</span>
+    </div>
+    <div class="project-tab">
+      <span class="dot error"></span>
+      <span class="name">Ytb_EnterRealVideoNews</span>
+      <span class="close">×</span>
+    </div>
+    <div class="project-tab">
+      <span class="dot running"></span>
+      <span class="name">devIdeTool</span>
+      <span class="close">×</span>
+    </div>
+    <div class="tab-add" title="프로젝트 열기">＋</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- LEFT AREA -->
+    <div class="left-area">
+      <div class="left-top">
+
+        <!-- PANEL: FOLDERS -->
+        <div class="panel-folders">
+          <div class="panel-header">
+            <span class="title">프로젝트</span>
+            <div class="actions">
+              <button title="새로고침">↻</button>
+            </div>
+          </div>
+          <div class="content">
+            <div class="section-title">★ 즐겨찾기</div>
+            <div class="folder-item opened active">
+              <span class="icon-status running"></span>
+              <span class="pin">★</span>
+              <span class="name">Ytb_HotNews</span>
+            </div>
+            <div class="folder-item opened">
+              <span class="icon-status running"></span>
+              <span class="pin">★</span>
+              <span class="name">check-pc-status</span>
+            </div>
+            <div class="section-title">최근</div>
+            <div class="folder-item opened">
+              <span class="icon-status hibernate"></span>
+              <span class="name">Ytb_MusicVideo</span>
+            </div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">Ytb_SisaNews</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">mobileapps</span></div>
+            <div class="section-title">전체 (D:\Projects)</div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">(Study)_AWS_SAP</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">(Study)_cppg_data</span></div>
+            <div class="folder-item opened"><span class="icon-status error"></span><span class="name">Ytb_EnterRealVideo</span></div>
+            <div class="folder-item opened"><span class="icon-status running"></span><span class="name">Ytb_HotNews2</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">Ytb_HotNews3</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">_new_idea_</span></div>
+            <div class="folder-item opened"><span class="icon-status running"></span><span class="name">devIdeTool</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">installtools</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">mobile_jungle</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">mobilegames</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">smallcode</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">winapps</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">wingames</span></div>
+            <div class="folder-item"><span class="icon-status idle"></span><span class="name">winwriting</span></div>
+          </div>
+        </div>
+
+        <div class="resizer-v"></div>
+
+        <!-- PANEL: FILES -->
+        <div class="panel-files">
+          <div class="panel-header">
+            <span class="title">Ytb_HotNews · 파일</span>
+            <div class="actions">
+              <button title="새 파일">+</button>
+              <button title="새로고침">↻</button>
+            </div>
+          </div>
+          <div class="search">
+            <input type="text" placeholder="파일 검색..." />
+          </div>
+          <div class="content">
+            <div class="file-item folder"><span class="caret">▾</span><span class="file-icon folder">📁</span><span>src</span></div>
+            <div class="file-item folder indent-1"><span class="caret">▾</span><span class="file-icon folder">📁</span><span>crawler</span></div>
+            <div class="file-item selected indent-2"><span class="caret"></span><span class="file-icon py">🐍</span><span>youtube_api.py</span></div>
+            <div class="file-item indent-2"><span class="caret"></span><span class="file-icon py">🐍</span><span>scraper.py</span></div>
+            <div class="file-item folder indent-1"><span class="caret">▸</span><span class="file-icon folder">📁</span><span>processors</span></div>
+            <div class="file-item indent-1"><span class="caret"></span><span class="file-icon py">🐍</span><span>main.py</span></div>
+            <div class="file-item indent-1"><span class="caret"></span><span class="file-icon py">🐍</span><span>config.py</span></div>
+            <div class="file-item folder"><span class="caret">▸</span><span class="file-icon folder">📁</span><span>tests</span></div>
+            <div class="file-item folder"><span class="caret">▸</span><span class="file-icon folder">📁</span><span>data</span></div>
+            <div class="file-item folder"><span class="caret">▸</span><span class="file-icon folder">📁</span><span>output</span></div>
+            <div class="file-item"><span class="caret"></span><span class="file-icon">📄</span><span>README.md</span></div>
+            <div class="file-item"><span class="caret"></span><span class="file-icon">📋</span><span>requirements.txt</span></div>
+            <div class="file-item"><span class="caret"></span><span class="file-icon">📄</span><span>.gitignore</span></div>
+            <div class="file-item"><span class="caret"></span><span class="file-icon">⚙</span><span>.devidetool.json</span></div>
+            <div class="file-item"><span class="caret"></span><span class="file-icon">📝</span><span>user_defined_memo.md</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="resizer-h"></div>
+
+      <!-- PANEL: MEMO -->
+      <div class="panel-memo">
+        <div class="panel-header">
+          <span class="title">📝 메모 · user_defined_memo.md</span>
+        </div>
+        <div class="memo-toolbar">
+          <div class="seg">
+            <button class="active">편집</button>
+            <button>프리뷰</button>
+          </div>
+          <button class="btn" title="저장 (Ctrl+S)">💾 저장</button>
+          <div class="status">자동저장 <span class="saved">✓ 방금</span></div>
+        </div>
+        <div class="memo-body">
+<span class="md-h"># Ytb_HotNews 작업 메모</span>
+
+<span class="md-h">## 오늘 할일 (2026-04-18)</span>
+<span class="md-todo">- [ ]</span> youtube_api.py 레이트 리밋 처리 개선
+<span class="md-todo">- [ ]</span> scraper.py 예외처리 세분화
+<span class="md-todo-done">- [x]</span> <span class="md-todo-done">테스트 데이터셋 정리</span>
+
+<span class="md-h">## 메모</span>
+<span class="md-bullet">-</span> YouTube API quota: 10000/day, <span class="md-code">get_videos()</span> 호출시 주의
+<span class="md-bullet">-</span> config.py의 <span class="md-code">TARGET_CHANNELS</span>은 DB에서 읽도록 리팩터 예정
+<span class="md-bullet">-</span> output/ 디렉토리 구조:
+<span class="md-code">    raw/  → processed/  → published/</span>
+
+<span class="md-h">## 이슈 & 참고</span>
+<span class="md-bullet">-</span> 지난주 크래시: scraper.py:30 너무 광범위한 <span class="md-code">except</span>
+<span class="md-bullet">-</span> Claude 추천: <span class="md-code">requests.exceptions.HTTPError</span> 구체화
+        </div>
+      </div>
+    </div>
+
+    <div class="resizer-v"></div>
+
+    <!-- RIGHT AREA -->
+    <div class="right-area">
+
+      <!-- PANEL: EDITOR (40%) -->
+      <div class="panel-editor">
+        <div class="editor-tabs">
+          <div class="editor-tab active">
+            <span class="file-icon py">🐍</span>
+            <span>youtube_api.py</span>
+            <span class="dirty">●</span>
+            <span class="close">×</span>
+          </div>
+          <div class="editor-tab">
+            <span class="file-icon py">🐍</span>
+            <span>config.py</span>
+            <span class="close">×</span>
+          </div>
+        </div>
+        <div class="breadcrumb">
+          D:\Projects\Ytb_HotNews <span class="sep">›</span> src <span class="sep">›</span> crawler <span class="sep">›</span> <span class="current">youtube_api.py</span>
+        </div>
+        <div class="editor-body">
+          <div class="line-numbers">
+            <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div>
+            <div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
+            <div>11</div><div>12</div><div>13</div><div>14</div><div>15</div>
+            <div>16</div><div>17</div><div>18</div><div>19</div><div>20</div>
+            <div>21</div><div>22</div><div>23</div><div>24</div>
+            <div class="active">25</div>
+            <div>26</div><div>27</div><div>28</div><div>29</div><div>30</div>
+          </div><div class="code"><span class="comment">"""YouTube Data API v3 wrapper with rate limiting."""</span>
+<span class="kw">from</span> typing <span class="kw">import</span> Optional, List
+<span class="kw">import</span> time
+<span class="kw">import</span> logging
+<span class="kw">from</span> googleapiclient.discovery <span class="kw">import</span> build
+<span class="kw">from</span> googleapiclient.errors <span class="kw">import</span> HttpError
+
+logger = logging.getLogger(__name__)
+
+<span class="kw">class</span> <span class="cls">YouTubeAPI</span>:
+    <span class="str">"""Wrapper around YouTube Data API v3 with quota tracking."""</span>
+
+    DAILY_QUOTA = <span class="num">10000</span>
+    COST_PER_SEARCH = <span class="num">100</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, api_key: str):
+        <span class="self">self</span>.api_key = api_key
+        <span class="self">self</span>.client = build(<span class="str">"youtube"</span>, <span class="str">"v3"</span>, developerKey=api_key)
+        <span class="self">self</span>.quota_used = <span class="num">0</span>
+
+    <span class="kw">def</span> <span class="fn">get_videos</span>(<span class="self">self</span>, channel_id: str, max_results: int = <span class="num">50</span>) -> List[dict]:
+        <span class="comment"># TODO: 레이트 리밋 처리 개선 필요 (Claude 리뷰 지적사항)</span>
+        <span class="kw">if</span> <span class="self">self</span>.quota_used + <span class="self">self</span>.COST_PER_SEARCH > <span class="self">self</span>.DAILY_QUOTA:
+            <span class="kw">raise</span> RuntimeError(<span class="str">"일일 quota 초과"</span>)
+<span class="active-line">        request = <span class="self">self</span>.client.search().list(
+</span>            part=<span class="str">"snippet"</span>,
+            channelId=channel_id,
+            maxResults=max_results,
+            order=<span class="str">"date"</span>,
+        )
+        response = request.execute()
+        <span class="self">self</span>.quota_used += <span class="self">self</span>.COST_PER_SEARCH
+        <span class="kw">return</span> response.get(<span class="str">"items"</span>, [])</div>
+        </div>
+      </div>
+
+      <div class="resizer-h"></div>
+
+      <!-- PANEL: TERMINAL CLAUDE (30%) -->
+      <div class="panel-terminal focused">
+        <div class="terminal-label">▲ PowerShell + Claude</div>
+        <div class="terminal">
+          <div><span class="info">Windows PowerShell · venv 활성화 · claude 실행</span></div>
+          <div><span class="prompt">(venv) PS</span> <span class="path">D:\Projects\Ytb_HotNews&gt;</span> claude</div>
+          <div><span class="highlight">✻ Welcome to Claude Code!</span> <span class="info">cwd: D:\Projects\Ytb_HotNews</span></div>
+          <div>&nbsp;</div>
+          <div><span style="color: var(--accent);">&gt;</span> youtube_api.py 리뷰해줘</div>
+          <div><span class="highlight">●</span> Read(src/crawler/youtube_api.py) <span class="info">⎿ 30 lines</span></div>
+          <div><span class="success">✓</span> 전체 구조 명확. <span class="warn">⚠</span> line 25: 레이트 리밋 처리 미흡</div>
+          <div>수정안 적용할까요?</div>
+          <div><span style="color: var(--accent);">&gt;</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+
+      <div class="resizer-h"></div>
+
+      <!-- PANEL: TERMINAL PLAIN (30%) -->
+      <div class="panel-terminal">
+        <div class="terminal-label">▼ PowerShell</div>
+        <div class="terminal">
+          <div><span class="info">Windows PowerShell · venv 활성화 (실행/테스트용)</span></div>
+          <div><span class="prompt">(venv) PS</span> <span class="path">D:\Projects\Ytb_HotNews&gt;</span> python -m pytest tests/ -v</div>
+          <div><span class="info">====== test session starts ======</span></div>
+          <div>tests/test_api.py::test_init <span class="success">PASSED</span></div>
+          <div>tests/test_api.py::test_get_videos <span class="success">PASSED</span></div>
+          <div>tests/test_scraper.py::test_parse <span class="error">FAILED</span></div>
+          <div><span class="info">====== 2 passed, 1 failed in 0.82s ======</span></div>
+          <div><span class="prompt">(venv) PS</span> <span class="path">D:\Projects\Ytb_HotNews&gt;</span> git status</div>
+          <div>On branch <span class="success">main</span>. Modified: <span class="warn">src/crawler/youtube_api.py</span></div>
+          <div><span class="prompt">(venv) PS</span> <span class="path">D:\Projects\Ytb_HotNews&gt;</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <div class="item">📊 세션 6/20</div>
+    <span class="sep">│</span>
+    <div class="item">💾 RAM 2.3 GB</div>
+    <span class="sep">│</span>
+    <div class="item">🟢 3 · 🟡 1 · 🔴 1</div>
+    <span class="sep">│</span>
+    <div class="item">📁 D:\Projects\Ytb_HotNews</div>
+    <span class="sep">│</span>
+    <div class="item">⎇ main</div>
+    <span class="sep">│</span>
+    <div class="item">📝 youtube_api.py (수정됨)</div>
+    <div class="spacer"></div>
+    <div class="item">Python 3.11 · venv</div>
+    <span class="sep">│</span>
+    <div class="item">UTF-8</div>
+    <span class="sep">│</span>
+    <div class="item">자동저장: 방금</div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.scheme-switcher .ss-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const scheme = btn.dataset.scheme;
+      document.body.className = 'scheme-' + scheme;
+      document.querySelectorAll('.scheme-switcher .ss-btn').forEach(b => {
+        b.classList.toggle('active', b === btn);
+      });
+    });
+  });
+</script>
+</body>
+</html>
