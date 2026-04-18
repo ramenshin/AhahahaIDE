@@ -1,0 +1,110 @@
+:root {
+  --bg-0: #1e1e2e;
+  --bg-1: #252535;
+  --bg-2: #2a2a3d;
+  --bg-hover: #34344a;
+  --bg-active: #3d3d5c;
+  --border: #3a3a4e;
+  --text-0: #e4e4ef;
+  --text-1: #a0a0b8;
+  --text-2: #6a6a85;
+  --accent: #89b4fa;
+  --accent-bright: #b4d2ff;
+  --green: #a6e3a1;
+  --yellow: #f9e2af;
+  --red: #f38ba8;
+  --gray: #6c7086;
+  --mauve: #cba6f7;
+  --orange: #fab387;
+  --teal: #94e2d5;
+  --pink: #f5c2e7;
+
+  /* 기본 스킴 = D 틸 그린 */
+  --top-bar-bg: #1a1f24;
+  --tabs-row-bg: #0f2a30;
+  --tab-inactive-bg: #143a42;
+  --tab-hover-bg: #1e5260;
+  --tab-active-bg: #1e4b55;
+  --tab-active-accent: #94e2d5;
+  --tab-border: #0a1f24;
+}
+
+body.scheme-a {
+  --top-bar-bg: #1a1626;
+  --tabs-row-bg: #2a2b3d;
+  --tab-inactive-bg: #323648;
+  --tab-hover-bg: #424660;
+  --tab-active-bg: #3d4060;
+  --tab-active-accent: #89b4fa;
+  --tab-border: #1f2230;
+}
+
+body.scheme-b {
+  --top-bar-bg: #181825;
+  --tabs-row-bg: #252540;
+  --tab-inactive-bg: #2d2d48;
+  --tab-hover-bg: #3a3a5a;
+  --tab-active-bg: #3d3a5e;
+  --tab-active-accent: #cba6f7;
+  --tab-border: #2a2540;
+}
+
+body.scheme-c {
+  --top-bar-bg: #0f1729;
+  --tabs-row-bg: #1e2a4a;
+  --tab-inactive-bg: #263459;
+  --tab-hover-bg: #324373;
+  --tab-active-bg: #334a7a;
+  --tab-active-accent: #74c7ec;
+  --tab-border: #172039;
+}
+
+body.scheme-d {
+  --top-bar-bg: #1a1f24;
+  --tabs-row-bg: #0f2a30;
+  --tab-inactive-bg: #143a42;
+  --tab-hover-bg: #1e5260;
+  --tab-active-bg: #1e4b55;
+  --tab-active-accent: #94e2d5;
+  --tab-border: #0a1f24;
+}
+
+body.scheme-e {
+  --top-bar-bg: #1e1f29;
+  --tabs-row-bg: #282a36;
+  --tab-inactive-bg: #343746;
+  --tab-hover-bg: #44475a;
+  --tab-active-bg: #44475a;
+  --tab-active-accent: #ff79c6;
+  --tab-border: #22232e;
+}
+
+body.scheme-f {
+  --top-bar-bg: #1e222a;
+  --tabs-row-bg: #282c34;
+  --tab-inactive-bg: #353b45;
+  --tab-hover-bg: #4b5263;
+  --tab-active-bg: #3e4452;
+  --tab-active-accent: #61afef;
+  --tab-border: #21252b;
+}
+
+body.scheme-g {
+  --top-bar-bg: #002b36;
+  --tabs-row-bg: #073642;
+  --tab-inactive-bg: #0f4452;
+  --tab-hover-bg: #1e5b6e;
+  --tab-active-bg: #1b5b6e;
+  --tab-active-accent: #268bd2;
+  --tab-border: #003847;
+}
+
+body.scheme-h {
+  --top-bar-bg: #1d2021;
+  --tabs-row-bg: #282828;
+  --tab-inactive-bg: #3c3836;
+  --tab-hover-bg: #504945;
+  --tab-active-bg: #504945;
+  --tab-active-accent: #fabd2f;
+  --tab-border: #1d2021;
+}

@@ -1,0 +1,26 @@
+appId: com.ramenshin.devidetool
+productName: devIdeTool
+copyright: Copyright © 2026 ramenshin
+
+directories:
+  output: dist
+  buildResources: resources
+
+files:
+  - out/**/*
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  artifactName: ${productName}-${version}-portable.${ext}
+
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
