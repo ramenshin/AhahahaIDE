@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import type { AppConfig, ProjectFolder } from '@shared/types'
 import { TopBar } from './components/TopBar'
@@ -6,13 +6,16 @@ import { ProjectTabBar } from './components/ProjectTabBar'
 import { ProjectTree } from './components/ProjectTree'
 import { StatusBar } from './components/StatusBar'
 import { Placeholder } from './components/Placeholder'
+import { Terminal } from './components/Terminal'
 
 export function App() {
   const [config, setConfig] = useState<AppConfig | null>(null)
   const [folders, setFolders] = useState<ProjectFolder[]>([])
   const [loading, setLoading] = useState(true)
   const [scanError, setScanError] = useState<string | null>(null)
-  const [selectedPath, setSelectedPath] = useState<string | null>(null)
+  const [openPaths, setOpenPaths] = useState<string[]>([])
+  const [activePath, setActivePath] = useState<string | null>(null)
+  const [sessionError, setSessionError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -38,21 +41,71 @@ export function App() {
     }
   }, [])
 
-  const activeFolder = folders.find((f) => f.path === selectedPath) ?? null
+  const maxSessions = config?.maxSessions ?? 20
+
+  const openSession = useCallback(
+    (path: string) => {
+      setSessionError(null)
+      setOpenPaths((prev) => {
+        if (prev.includes(path)) return prev
+        if (prev.length >= maxSessions) {
+          setSessionError(
+            `최대 세션 ${maxSessions}개에 도달했습니다. 탭을 닫고 다시 시도하세요.`
+          )
+          return prev
+        }
+        return [...prev, path]
+      })
+      setActivePath(path)
+    },
+    [maxSessions]
+  )
+
+  const closeSession = useCallback(
+    (path: string) => {
+      setOpenPaths((prev) => {
+        const next = prev.filter((p) => p !== path)
+        setActivePath((curr) => {
+          if (curr !== path) return curr
+          return next.length > 0 ? next[next.length - 1] : null
+        })
+        return next
+      })
+    },
+    []
+  )
+
+  const activeFolder = folders.find((f) => f.path === activePath) ?? null
+
+  const openProjects = useMemo(
+    () =>
+      openPaths.map((path) => {
+        const folder = folders.find((f) => f.path === path)
+        return {
+          path,
+          name: folder?.name ?? path.split(/[\\/]/).pop() ?? path,
+          status: 'running' as const
+        }
+      }),
+    [openPaths, folders]
+  )
 
   return (
     <div className="app">
       <TopBar />
-      <ProjectTabBar openProjects={[]} activePath={null} />
+      <ProjectTabBar
+        openProjects={openProjects}
+        activePath={activePath}
+        onActivate={setActivePath}
+        onClose={closeSession}
+      />
       <PanelGroup direction="horizontal">
-        {/* LEFT AREA */}
         <Panel
           defaultSize={config?.ui.panels.leftWidth ?? 32}
           minSize={20}
           maxSize={55}
         >
           <PanelGroup direction="vertical">
-            {/* LEFT TOP: folders + files */}
             <Panel defaultSize={70} minSize={30}>
               <PanelGroup direction="horizontal">
                 <Panel
@@ -64,8 +117,8 @@ export function App() {
                     loading={loading}
                     error={scanError}
                     rootPath={config?.rootPath ?? null}
-                    selectedPath={selectedPath}
-                    onSelect={setSelectedPath}
+                    selectedPath={activePath}
+                    onSelect={openSession}
                   />
                 </Panel>
                 <PanelResizeHandle className="resize-handle-v" />
@@ -86,7 +139,6 @@ export function App() {
               </PanelGroup>
             </Panel>
             <PanelResizeHandle className="resize-handle-h" />
-            {/* LEFT BOTTOM: memo */}
             <Panel
               defaultSize={config?.ui.panels.memoHeight ?? 30}
               minSize={15}
@@ -107,7 +159,6 @@ export function App() {
 
         <PanelResizeHandle className="resize-handle-v" />
 
-        {/* RIGHT AREA */}
         <Panel minSize={35}>
           <PanelGroup direction="vertical">
             <Panel
@@ -134,11 +185,24 @@ export function App() {
                 <div className="panel-header">
                   <span className="title">▲ PowerShell + Claude</span>
                 </div>
-                <Placeholder
-                  phase="Phase 2"
-                  title="Claude 터미널"
-                  description="node-pty + xterm.js로 PowerShell 스폰, venv 활성화, claude 자동 실행."
-                />
+                {openPaths.length === 0 ? (
+                  <Placeholder
+                    phase="Phase 2"
+                    title="Claude 터미널"
+                    description="좌측에서 프로젝트 폴더를 클릭하면 PowerShell + Claude가 실행됩니다."
+                  />
+                ) : (
+                  <div className="terminal-stack">
+                    {openPaths.map((p) => (
+                      <div
+                        key={p}
+                        className={`terminal-slot${p === activePath ? ' active' : ''}`}
+                      >
+                        <Terminal folderPath={p} kind="claude" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </Panel>
             <PanelResizeHandle className="resize-handle-h" />
@@ -150,19 +214,37 @@ export function App() {
                 <div className="panel-header">
                   <span className="title">▼ PowerShell</span>
                 </div>
-                <Placeholder
-                  phase="Phase 2"
-                  title="일반 터미널"
-                  description="venv 활성화된 PowerShell. 테스트 실행, Git 명령 등에 사용."
-                />
+                {openPaths.length === 0 ? (
+                  <Placeholder
+                    phase="Phase 2"
+                    title="일반 터미널"
+                    description="프로젝트를 열면 venv 활성화된 PowerShell이 실행됩니다."
+                  />
+                ) : (
+                  <div className="terminal-stack">
+                    {openPaths.map((p) => (
+                      <div
+                        key={p}
+                        className={`terminal-slot${p === activePath ? ' active' : ''}`}
+                      >
+                        <Terminal folderPath={p} kind="plain" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </Panel>
           </PanelGroup>
         </Panel>
       </PanelGroup>
+      {sessionError && (
+        <div className="session-error" onClick={() => setSessionError(null)}>
+          {sessionError} <span className="dismiss">×</span>
+        </div>
+      )}
       <StatusBar
         folderCount={folders.length}
-        maxSessions={config?.maxSessions ?? 20}
+        maxSessions={maxSessions}
         rootPath={config?.rootPath ?? ''}
         activeFolderName={activeFolder?.name ?? null}
       />

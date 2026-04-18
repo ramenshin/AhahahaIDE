@@ -1,7 +1,7 @@
 export function TopBar() {
   return (
     <div className="top-bar">
-      <div className="app-title">⚡ devIdeTool</div>
+      <div className="app-title">⚡ AhahahaIDE</div>
       <button className="btn" type="button">+ 새 폴더</button>
       <button className="btn" type="button">⚙ 설정</button>
       <div className="spacer" />

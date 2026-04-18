@@ -43,6 +43,26 @@ export interface AppConfig {
 
 export type ColorScheme = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
 
+export type PtyKind = 'claude' | 'plain'
+
+export interface PtyCreateOptions {
+  folderPath: string
+  kind: PtyKind
+  cols: number
+  rows: number
+}
+
+export interface PtyDataPayload {
+  ptyId: string
+  data: string
+}
+
+export interface PtyExitPayload {
+  ptyId: string
+  exitCode: number
+  signal: number
+}
+
 export const DEFAULT_CONFIG: AppConfig = {
   rootPath: 'D:\\Projects',
   excludePatterns: ['venv', 'node_modules', '.git', '__pycache__', '.pytest_cache', '.vite', 'dist', 'out', 'build'],

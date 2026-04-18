@@ -1,7 +1,7 @@
 {
-  "name": "devidetool",
+  "name": "ahahahaide",
   "version": "0.1.0",
-  "description": "IDE-style dev environment tool for multi-project Claude Code + PowerShell workflows",
+  "description": "AhahahaIDE — IDE-style dev environment tool for multi-project Claude Code + PowerShell workflows",
   "author": "ramenshin",
   "license": "UNLICENSED",
   "private": true,
@@ -18,10 +18,10 @@
     "dist:portable": "npm run build && electron-builder --win portable"
   },
   "dependencies": {
-    "@homebridge/node-pty-prebuilt-multiarch": "^0.11.14",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/addon-web-links": "^0.11.0",
     "@xterm/xterm": "^5.5.0",
+    "node-pty": "^1.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-resizable-panels": "^2.1.7"

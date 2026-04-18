@@ -239,6 +239,47 @@ body {
 .statusbar .item:hover { color: var(--text-0); }
 .statusbar .spacer { flex: 1; }
 
+/* === XTERM TERMINAL HOST === */
+.terminal-stack {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+.terminal-slot {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+}
+.terminal-slot.active { display: flex; }
+.xterm-host {
+  flex: 1;
+  min-height: 0;
+  padding: 4px 6px;
+  background: var(--bg-1);
+  overflow: hidden;
+}
+.xterm-host .xterm { height: 100%; }
+.xterm-host .xterm-viewport { background-color: transparent !important; }
+
+/* === SESSION ERROR TOAST === */
+.session-error {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--red, #c04040);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.session-error .dismiss { margin-left: 8px; opacity: 0.7; }
+
 /* === SCROLLBAR === */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }

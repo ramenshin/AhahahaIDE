@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
 import { registerIpcHandlers } from './ipc-handlers'
+import { closeAllPtys } from './pty-manager'
 
 const isDev = !app.isPackaged
 
@@ -13,7 +14,7 @@ function createMainWindow(): BrowserWindow {
     backgroundColor: '#1a1f24',
     show: false,
     autoHideMenuBar: true,
-    title: 'devIdeTool',
+    title: 'AhahahaIDE',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -54,7 +55,12 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
+  closeAllPtys()
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('before-quit', () => {
+  closeAllPtys()
 })

@@ -8,9 +8,16 @@ interface OpenProject {
 interface Props {
   openProjects: OpenProject[]
   activePath: string | null
+  onActivate?: (path: string) => void
+  onClose?: (path: string) => void
 }
 
-export function ProjectTabBar({ openProjects, activePath }: Props) {
+export function ProjectTabBar({
+  openProjects,
+  activePath,
+  onActivate,
+  onClose
+}: Props) {
   return (
     <div className="project-tabs">
       {openProjects.length === 0 && (
@@ -20,15 +27,22 @@ export function ProjectTabBar({ openProjects, activePath }: Props) {
         <div
           key={p.path}
           className={`project-tab${p.path === activePath ? ' active' : ''}`}
+          onClick={() => onActivate?.(p.path)}
+          title={p.path}
         >
           <span className={`dot ${p.status}`} />
           <span className="name">{p.name}</span>
-          <span className="close">×</span>
+          <span
+            className="close"
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose?.(p.path)
+            }}
+          >
+            ×
+          </span>
         </div>
       ))}
-      {openProjects.length > 0 && (
-        <div className="tab-add" title="프로젝트 열기">＋</div>
-      )}
     </div>
   )
 }
