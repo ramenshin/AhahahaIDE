@@ -11,7 +11,8 @@ export const IpcChannel = {
   FsWatch: 'fs:watch',
   FsUnwatch: 'fs:unwatch',
   FsChange: 'fs:change',
-  FsRootRemoved: 'fs:root-removed'
+  FsRootRemoved: 'fs:root-removed',
+  DialogPickFolder: 'dialog:pick-folder'
 } as const
 
 export type IpcChannelValue = typeof IpcChannel[keyof typeof IpcChannel]

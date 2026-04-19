@@ -32,6 +32,8 @@ const api = {
     webFrame.setZoomFactor(clamped)
     return clamped
   },
+  pickFolder: (defaultPath?: string): Promise<string | null> =>
+    ipcRenderer.invoke(IpcChannel.DialogPickFolder, defaultPath),
   pty: {
     create: (opts: PtyCreateOptions): Promise<string> =>
       ipcRenderer.invoke(IpcChannel.PtyCreate, opts),

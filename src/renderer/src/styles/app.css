@@ -397,6 +397,93 @@ body {
   line-height: 1.5;
 }
 .settings-hint.kbd-hint { margin-top: 4px; }
+.settings-hint.warn {
+  color: var(--orange);
+  font-weight: 500;
+}
+.settings-section + .settings-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* 테마 프리셋 그리드 */
+.scheme-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+.scheme-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: var(--bg-2);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-1);
+  transition: border-color 0.1s;
+}
+.scheme-swatch:hover { border-color: var(--border); }
+.scheme-swatch.selected { border-color: var(--accent); }
+.scheme-swatch-bar {
+  height: 18px;
+  border-radius: 3px;
+  background-image: linear-gradient(to right, var(--sw-bg, #222) 0 60%, var(--sw-accent, #888) 60% 100%);
+}
+.scheme-swatch-label { text-align: center; color: var(--sw-accent, var(--text-1)); }
+
+.scheme-preview-a { --sw-bg: #2a2b3d; --sw-accent: #89b4fa; }
+.scheme-preview-b { --sw-bg: #252540; --sw-accent: #cba6f7; }
+.scheme-preview-c { --sw-bg: #1e2a4a; --sw-accent: #74c7ec; }
+.scheme-preview-d { --sw-bg: #0f2a30; --sw-accent: #94e2d5; }
+.scheme-preview-e { --sw-bg: #282a36; --sw-accent: #ff79c6; }
+.scheme-preview-f { --sw-bg: #282c34; --sw-accent: #61afef; }
+.scheme-preview-g { --sw-bg: #073642; --sw-accent: #268bd2; }
+.scheme-preview-h { --sw-bg: #282828; --sw-accent: #fabd2f; }
+
+/* 루트 경로 행 */
+.path-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.path-display {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-0);
+  font-family: monospace;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 제외 패턴 편집 */
+.exclude-editor {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-0);
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+}
+.exclude-editor:focus { border-color: var(--accent); }
+
 .settings-hint .kbd {
   background: var(--bg-2);
   border: 1px solid var(--border);

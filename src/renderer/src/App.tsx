@@ -80,12 +80,29 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [config, applyZoom, settingsOpen])
 
-  const handleSaveSettings = useCallback(async (next: AppConfig) => {
-    const saved = await window.api.setConfig(next)
-    setConfig(saved)
-    document.body.className = `scheme-${saved.ui.colorScheme}`
-    window.api.setZoom(saved.ui.zoomFactor)
-  }, [])
+  const handleSaveSettings = useCallback(
+    async (next: AppConfig) => {
+      const prevRootPath = config?.rootPath
+      const prevExcludes = config?.excludePatterns
+      const saved = await window.api.setConfig(next)
+      setConfig(saved)
+      document.body.className = `scheme-${saved.ui.colorScheme}`
+      window.api.setZoom(saved.ui.zoomFactor)
+      const rootChanged = prevRootPath !== saved.rootPath
+      const excludesChanged =
+        !!prevExcludes &&
+        JSON.stringify(prevExcludes) !== JSON.stringify(saved.excludePatterns)
+      if (rootChanged || excludesChanged) {
+        try {
+          const scan = await window.api.scanFolders()
+          setFolders(scan.folders)
+        } catch (err) {
+          setScanError(String(err))
+        }
+      }
+    },
+    [config]
+  )
 
   const refreshFolders = useCallback(async () => {
     setLoading(true)

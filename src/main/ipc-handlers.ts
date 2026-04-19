@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { IpcChannel } from '@shared/ipc-channels'
 import type { AppConfig, PtyCreateOptions } from '@shared/types'
 import { scanProjectFolders } from './folder-scanner'
@@ -77,4 +77,21 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.FsUnwatch, async () => {
     await stopWatch()
   })
+
+  ipcMain.handle(
+    IpcChannel.DialogPickFolder,
+    async (event, defaultPath?: string): Promise<string | null> => {
+      const win = BrowserWindow.fromWebContents(event.sender)
+      const opts: Electron.OpenDialogOptions = {
+        properties: ['openDirectory'],
+        title: '폴더 선택'
+      }
+      if (defaultPath) opts.defaultPath = defaultPath
+      const result = win
+        ? await dialog.showOpenDialog(win, opts)
+        : await dialog.showOpenDialog(opts)
+      if (result.canceled || result.filePaths.length === 0) return null
+      return result.filePaths[0]
+    }
+  )
 }
