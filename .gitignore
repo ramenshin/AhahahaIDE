@@ -60,3 +60,5 @@ __pycache__/
 # AhahahaIDE runtime
 config.local.json
 session-state.json
+# 각 프로젝트의 사용자 메모 — 리포별 로컬 노트라 커밋 대상 아님.
+user_defined_memo.md

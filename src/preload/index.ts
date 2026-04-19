@@ -34,6 +34,12 @@ const api = {
   },
   pickFolder: (defaultPath?: string): Promise<string | null> =>
     ipcRenderer.invoke(IpcChannel.DialogPickFolder, defaultPath),
+  memo: {
+    load: (projectPath: string): Promise<string | null> =>
+      ipcRenderer.invoke(IpcChannel.MemoLoad, projectPath),
+    save: (projectPath: string, content: string): Promise<void> =>
+      ipcRenderer.invoke(IpcChannel.MemoSave, projectPath, content)
+  },
   pty: {
     create: (opts: PtyCreateOptions): Promise<string> =>
       ipcRenderer.invoke(IpcChannel.PtyCreate, opts),

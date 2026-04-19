@@ -5,6 +5,7 @@ import { scanProjectFolders } from './folder-scanner'
 import { loadConfig, saveConfig } from './state-store'
 import { closePty, createPty, resizePty, writePty } from './pty-manager'
 import { startWatch, stopWatch } from './file-watcher'
+import { loadMemo, saveMemo } from './memo-store'
 
 export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.ScanFolders, async () => {
@@ -77,6 +78,20 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.FsUnwatch, async () => {
     await stopWatch()
   })
+
+  ipcMain.handle(
+    IpcChannel.MemoLoad,
+    async (_event, projectPath: string): Promise<string | null> => {
+      return loadMemo(projectPath)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannel.MemoSave,
+    async (_event, projectPath: string, content: string): Promise<void> => {
+      await saveMemo(projectPath, content)
+    }
+  )
 
   ipcMain.handle(
     IpcChannel.DialogPickFolder,

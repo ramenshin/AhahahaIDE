@@ -10,6 +10,7 @@ import { Placeholder } from './components/Placeholder'
 import { Terminal } from './components/Terminal'
 import { SettingsModal } from './components/SettingsModal'
 import { FileExplorer } from './components/FileExplorer'
+import { MemoEditor } from './components/MemoEditor'
 
 export function App() {
   const [config, setConfig] = useState<AppConfig | null>(null)
@@ -20,6 +21,7 @@ export function App() {
   const [activePath, setActivePath] = useState<string | null>(null)
   const [sessionError, setSessionError] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [memoDirty, setMemoDirty] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -237,13 +239,23 @@ export function App() {
             >
               <div className="panel">
                 <div className="panel-header">
-                  <span className="title">📝 메모 · user_defined_memo.md</span>
+                  <span className="title">
+                    📝 메모 · user_defined_memo.md{memoDirty ? ' ●' : ''}
+                  </span>
                 </div>
-                <Placeholder
-                  phase="Phase 7"
-                  title="프로젝트 메모"
-                  description="각 프로젝트의 user_defined_memo.md 파일을 편집/저장합니다. Monaco 기반."
-                />
+                {activeFolder ? (
+                  <MemoEditor
+                    key={activeFolder.path}
+                    projectPath={activeFolder.path}
+                    onDirtyChange={setMemoDirty}
+                  />
+                ) : (
+                  <Placeholder
+                    phase="Phase 4-B"
+                    title="프로젝트 메모"
+                    description="프로젝트를 선택하면 user_defined_memo.md 파일이 열립니다."
+                  />
+                )}
               </div>
             </Panel>
           </PanelGroup>

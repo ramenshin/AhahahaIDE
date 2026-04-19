@@ -281,6 +281,20 @@ body {
 }
 .session-error .dismiss { margin-left: 8px; opacity: 0.7; }
 
+/* === MEMO EDITOR === */
+.memo-editor-host {
+  flex: 1;
+  min-height: 0;
+  background: var(--bg-1);
+  overflow: hidden;
+}
+.memo-error {
+  flex: 1;
+  padding: 20px;
+  color: var(--red);
+  font-size: 12px;
+}
+
 /* === FILE EXPLORER === */
 .file-explorer {
   padding: 4px 0;

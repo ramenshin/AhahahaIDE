@@ -12,7 +12,9 @@ export const IpcChannel = {
   FsUnwatch: 'fs:unwatch',
   FsChange: 'fs:change',
   FsRootRemoved: 'fs:root-removed',
-  DialogPickFolder: 'dialog:pick-folder'
+  DialogPickFolder: 'dialog:pick-folder',
+  MemoLoad: 'memo:load',
+  MemoSave: 'memo:save'
 } as const
 
 export type IpcChannelValue = typeof IpcChannel[keyof typeof IpcChannel]
