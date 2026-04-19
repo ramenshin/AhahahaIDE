@@ -4,6 +4,7 @@ import type { AppConfig, PtyCreateOptions } from '@shared/types'
 import { scanProjectFolders } from './folder-scanner'
 import { loadConfig, saveConfig } from './state-store'
 import { closePty, createPty, resizePty, writePty } from './pty-manager'
+import { startWatch, stopWatch } from './file-watcher'
 
 export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.ScanFolders, async () => {
@@ -52,5 +53,28 @@ export function registerIpcHandlers(): void {
 
   ipcMain.on(IpcChannel.PtyClose, (_event, ptyId: string) => {
     closePty(ptyId)
+  })
+
+  ipcMain.handle(IpcChannel.FsWatch, async (event, rootPath: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    const config = await loadConfig()
+    return startWatch(
+      rootPath,
+      config.excludePatterns,
+      (ev) => {
+        if (win && !win.isDestroyed()) {
+          win.webContents.send(IpcChannel.FsChange, ev)
+        }
+      },
+      () => {
+        if (win && !win.isDestroyed()) {
+          win.webContents.send(IpcChannel.FsRootRemoved, rootPath)
+        }
+      }
+    )
+  })
+
+  ipcMain.handle(IpcChannel.FsUnwatch, async () => {
+    await stopWatch()
   })
 }

@@ -8,7 +8,9 @@ import { IpcChannel } from '@shared/ipc-channels'
 import { clampZoom } from '@shared/types'
 import type {
   AppConfig,
+  FileTreeSnapshot,
   FolderScanResult,
+  FsChangeEvent,
   PtyCreateOptions,
   PtyDataPayload,
   PtyExitPayload
@@ -53,6 +55,23 @@ const api = {
         cb(payload)
       ipcRenderer.on(IpcChannel.PtyExit, listener)
       return () => ipcRenderer.off(IpcChannel.PtyExit, listener)
+    }
+  },
+  fs: {
+    watch: (rootPath: string): Promise<FileTreeSnapshot> =>
+      ipcRenderer.invoke(IpcChannel.FsWatch, rootPath),
+    unwatch: (): Promise<void> => ipcRenderer.invoke(IpcChannel.FsUnwatch),
+    onChange: (cb: (ev: FsChangeEvent) => void): (() => void) => {
+      const listener = (_ev: IpcRendererEvent, payload: FsChangeEvent) =>
+        cb(payload)
+      ipcRenderer.on(IpcChannel.FsChange, listener)
+      return () => ipcRenderer.off(IpcChannel.FsChange, listener)
+    },
+    onRootRemoved: (cb: (rootPath: string) => void): (() => void) => {
+      const listener = (_ev: IpcRendererEvent, rootPath: string) =>
+        cb(rootPath)
+      ipcRenderer.on(IpcChannel.FsRootRemoved, listener)
+      return () => ipcRenderer.off(IpcChannel.FsRootRemoved, listener)
     }
   }
 }

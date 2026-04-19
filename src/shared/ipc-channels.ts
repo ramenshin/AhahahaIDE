@@ -7,7 +7,11 @@ export const IpcChannel = {
   PtyResize: 'pty:resize',
   PtyClose: 'pty:close',
   PtyData: 'pty:data',
-  PtyExit: 'pty:exit'
+  PtyExit: 'pty:exit',
+  FsWatch: 'fs:watch',
+  FsUnwatch: 'fs:unwatch',
+  FsChange: 'fs:change',
+  FsRootRemoved: 'fs:root-removed'
 } as const
 
 export type IpcChannelValue = typeof IpcChannel[keyof typeof IpcChannel]

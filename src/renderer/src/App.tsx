@@ -9,6 +9,7 @@ import { StatusBar } from './components/StatusBar'
 import { Placeholder } from './components/Placeholder'
 import { Terminal } from './components/Terminal'
 import { SettingsModal } from './components/SettingsModal'
+import { FileExplorer } from './components/FileExplorer'
 
 export function App() {
   const [config, setConfig] = useState<AppConfig | null>(null)
@@ -85,6 +86,29 @@ export function App() {
     document.body.className = `scheme-${saved.ui.colorScheme}`
     window.api.setZoom(saved.ui.zoomFactor)
   }, [])
+
+  const refreshFolders = useCallback(async () => {
+    setLoading(true)
+    setScanError(null)
+    try {
+      const scan = await window.api.scanFolders()
+      setFolders(scan.folders)
+    } catch (err) {
+      setScanError(String(err))
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const dispose = window.api.fs.onRootRemoved((removed: string) => {
+      setSessionError(`폴더가 삭제되어 세션을 닫습니다: ${removed}`)
+      setOpenPaths((prev) => prev.filter((p) => p !== removed))
+      setActivePath((curr) => (curr === removed ? null : curr))
+      refreshFolders()
+    })
+    return () => dispose()
+  }, [refreshFolders])
 
   const maxSessions = config?.maxSessions ?? 20
 
@@ -163,7 +187,9 @@ export function App() {
                     error={scanError}
                     rootPath={config?.rootPath ?? null}
                     selectedPath={activePath}
+                    openedPaths={openPaths}
                     onSelect={openSession}
+                    onRefresh={refreshFolders}
                   />
                 </Panel>
                 <PanelResizeHandle className="resize-handle-v" />
@@ -174,11 +200,15 @@ export function App() {
                         {activeFolder ? `${activeFolder.name} · 파일` : '파일 탐색기'}
                       </span>
                     </div>
-                    <Placeholder
-                      phase="Phase 3"
-                      title="파일 탐색기"
-                      description="chokidar 실시간 감시로 선택 프로젝트의 파일 트리를 표시합니다."
-                    />
+                    {activeFolder ? (
+                      <FileExplorer rootPath={activeFolder.path} />
+                    ) : (
+                      <Placeholder
+                        phase="Phase 3"
+                        title="파일 탐색기"
+                        description="프로젝트를 선택하면 파일 트리가 표시됩니다."
+                      />
+                    )}
                   </div>
                 </Panel>
               </PanelGroup>

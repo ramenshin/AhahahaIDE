@@ -2,8 +2,18 @@ import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
 import { registerIpcHandlers } from './ipc-handlers'
 import { closeAllPtys } from './pty-manager'
+import { stopWatch } from './file-watcher'
 
 const isDev = !app.isPackaged
+
+// 최종 안전망: 처리되지 않은 예외로 메인 프로세스가 죽는 것을 막는다.
+// 주요 케이스: chokidar의 'error' 이벤트가 리스너 전에 emit되거나, IPC 핸들러 내부 실수.
+process.on('uncaughtException', (err) => {
+  console.error('[main] uncaughtException:', err)
+})
+process.on('unhandledRejection', (reason) => {
+  console.error('[main] unhandledRejection:', reason)
+})
 
 function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -56,6 +66,7 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   closeAllPtys()
+  stopWatch()
   if (process.platform !== 'darwin') {
     app.quit()
   }
@@ -63,4 +74,5 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   closeAllPtys()
+  stopWatch()
 })

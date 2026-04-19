@@ -73,6 +73,26 @@ export interface PtyExitPayload {
   signal: number
 }
 
+export interface FileNode {
+  name: string
+  path: string
+  isDirectory: boolean
+}
+
+export interface FileTreeSnapshot {
+  rootPath: string
+  nodes: FileNode[]
+}
+
+export type FsChangeType = 'add' | 'addDir' | 'unlink' | 'unlinkDir' | 'change'
+
+export interface FsChangeEvent {
+  rootPath: string
+  type: FsChangeType
+  path: string
+  isDirectory: boolean
+}
+
 export const DEFAULT_CONFIG: AppConfig = {
   rootPath: 'D:\\Projects',
   excludePatterns: ['venv', 'node_modules', '.git', '__pycache__', '.pytest_cache', '.vite', 'dist', 'out', 'build'],
