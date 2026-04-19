@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import type { AppConfig, ProjectFolder } from '@shared/types'
+import { ZOOM_STEP, clampZoom } from '@shared/types'
 import { TopBar } from './components/TopBar'
 import { ProjectTabBar } from './components/ProjectTabBar'
 import { ProjectTree } from './components/ProjectTree'
 import { StatusBar } from './components/StatusBar'
 import { Placeholder } from './components/Placeholder'
 import { Terminal } from './components/Terminal'
+import { SettingsModal } from './components/SettingsModal'
 
 export function App() {
   const [config, setConfig] = useState<AppConfig | null>(null)
@@ -16,6 +18,7 @@ export function App() {
   const [openPaths, setOpenPaths] = useState<string[]>([])
   const [activePath, setActivePath] = useState<string | null>(null)
   const [sessionError, setSessionError] = useState<string | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -28,6 +31,7 @@ export function App() {
         if (cancelled) return
         setConfig(cfg)
         document.body.className = `scheme-${cfg.ui.colorScheme}`
+        window.api.setZoom(cfg.ui.zoomFactor)
         setFolders(scan.folders)
       } catch (err) {
         if (!cancelled) setScanError(String(err))
@@ -39,6 +43,47 @@ export function App() {
     return () => {
       cancelled = true
     }
+  }, [])
+
+  const applyZoom = useCallback(
+    async (nextFactor: number) => {
+      if (!config) return
+      const clamped = clampZoom(nextFactor)
+      window.api.setZoom(clamped)
+      const nextConfig: AppConfig = {
+        ...config,
+        ui: { ...config.ui, zoomFactor: clamped }
+      }
+      setConfig(nextConfig)
+      await window.api.setConfig(nextConfig)
+    },
+    [config]
+  )
+
+  useEffect(() => {
+    if (!config || settingsOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.ctrlKey || e.altKey || e.shiftKey || e.metaKey) return
+      if (e.key === '=' || e.key === '+') {
+        e.preventDefault()
+        applyZoom(config.ui.zoomFactor + ZOOM_STEP)
+      } else if (e.key === '-' || e.key === '_') {
+        e.preventDefault()
+        applyZoom(config.ui.zoomFactor - ZOOM_STEP)
+      } else if (e.key === '0') {
+        e.preventDefault()
+        applyZoom(1.0)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [config, applyZoom, settingsOpen])
+
+  const handleSaveSettings = useCallback(async (next: AppConfig) => {
+    const saved = await window.api.setConfig(next)
+    setConfig(saved)
+    document.body.className = `scheme-${saved.ui.colorScheme}`
+    window.api.setZoom(saved.ui.zoomFactor)
   }, [])
 
   const maxSessions = config?.maxSessions ?? 20
@@ -92,7 +137,7 @@ export function App() {
 
   return (
     <div className="app">
-      <TopBar />
+      <TopBar onOpenSettings={() => setSettingsOpen(true)} />
       <ProjectTabBar
         openProjects={openProjects}
         activePath={activePath}
@@ -248,6 +293,13 @@ export function App() {
         rootPath={config?.rootPath ?? ''}
         activeFolderName={activeFolder?.name ?? null}
       />
+      {settingsOpen && config && (
+        <SettingsModal
+          config={config}
+          onClose={() => setSettingsOpen(false)}
+          onSave={handleSaveSettings}
+        />
+      )}
     </div>
   )
 }

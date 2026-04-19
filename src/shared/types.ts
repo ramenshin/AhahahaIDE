@@ -21,6 +21,7 @@ export interface AppConfig {
   ui: {
     colorScheme: ColorScheme
     showGitBranch: boolean
+    zoomFactor: number
     panels: {
       leftWidth: number
       folderListWidth: number
@@ -42,6 +43,15 @@ export interface AppConfig {
 }
 
 export type ColorScheme = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
+
+export const ZOOM_MIN = 0.8
+export const ZOOM_MAX = 1.5
+export const ZOOM_STEP = 0.1
+
+export function clampZoom(value: number): number {
+  if (!Number.isFinite(value)) return 1.0
+  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, value))
+}
 
 export type PtyKind = 'claude' | 'plain'
 
@@ -71,6 +81,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   ui: {
     colorScheme: 'd',
     showGitBranch: true,
+    zoomFactor: 1.0,
     panels: {
       leftWidth: 32,
       folderListWidth: 42,

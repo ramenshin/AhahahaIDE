@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { app } from 'electron'
-import { DEFAULT_CONFIG, type AppConfig } from '@shared/types'
+import { clampZoom, DEFAULT_CONFIG, type AppConfig } from '@shared/types'
 
 const CONFIG_FILENAME = 'config.json'
 
@@ -10,7 +10,7 @@ function getConfigPath(): string {
 }
 
 function mergeConfig(partial: Partial<AppConfig>): AppConfig {
-  return {
+  const merged: AppConfig = {
     ...DEFAULT_CONFIG,
     ...partial,
     ui: { ...DEFAULT_CONFIG.ui, ...(partial.ui ?? {}),
@@ -18,6 +18,8 @@ function mergeConfig(partial: Partial<AppConfig>): AppConfig {
     hibernate: { ...DEFAULT_CONFIG.hibernate, ...(partial.hibernate ?? {}) },
     notifications: { ...DEFAULT_CONFIG.notifications, ...(partial.notifications ?? {}) }
   }
+  merged.ui.zoomFactor = clampZoom(merged.ui.zoomFactor)
+  return merged
 }
 
 export async function loadConfig(): Promise<AppConfig> {

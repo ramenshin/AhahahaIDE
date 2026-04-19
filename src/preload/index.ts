@@ -1,5 +1,11 @@
-import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
+import {
+  contextBridge,
+  ipcRenderer,
+  webFrame,
+  type IpcRendererEvent
+} from 'electron'
 import { IpcChannel } from '@shared/ipc-channels'
+import { clampZoom } from '@shared/types'
 import type {
   AppConfig,
   FolderScanResult,
@@ -8,6 +14,10 @@ import type {
   PtyExitPayload
 } from '@shared/types'
 
+// 터미널 세션 최대 20개 × 채널 2개 = 40 리스너가 상한.
+// 기본 10 한도는 의도적 다중 구독에도 경고를 띄우므로 여유 있게 50으로 상향.
+ipcRenderer.setMaxListeners(50)
+
 const api = {
   scanFolders: (): Promise<FolderScanResult> =>
     ipcRenderer.invoke(IpcChannel.ScanFolders),
@@ -15,6 +25,11 @@ const api = {
     ipcRenderer.invoke(IpcChannel.GetConfig),
   setConfig: (config: AppConfig): Promise<AppConfig> =>
     ipcRenderer.invoke(IpcChannel.SetConfig, config),
+  setZoom: (factor: number): number => {
+    const clamped = clampZoom(factor)
+    webFrame.setZoomFactor(clamped)
+    return clamped
+  },
   pty: {
     create: (opts: PtyCreateOptions): Promise<string> =>
       ipcRenderer.invoke(IpcChannel.PtyCreate, opts),
