@@ -113,6 +113,9 @@ body {
   flex-direction: column;
   height: 100%;
 }
+/* 메모·에디터·터미널 4개 작업공간 패널: 헤더 제외 본문은 순수 검정 */
+.panel.panel-black { background: #000000; }
+.panel.panel-black .placeholder { background: transparent; }
 .panel-header {
   background: var(--bg-1);
   color: var(--text-1);
@@ -258,7 +261,7 @@ body {
   flex: 1;
   min-height: 0;
   padding: 4px 6px;
-  background: var(--bg-1);
+  background: #000000;
   overflow: hidden;
 }
 .xterm-host .xterm { height: 100%; }
@@ -285,7 +288,7 @@ body {
 .memo-editor-host {
   flex: 1;
   min-height: 0;
-  background: var(--bg-1);
+  background: #000000;
   overflow: hidden;
 }
 .memo-error {

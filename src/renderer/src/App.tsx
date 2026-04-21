@@ -237,7 +237,7 @@ export function App() {
               defaultSize={config?.ui.panels.memoHeight ?? 30}
               minSize={15}
             >
-              <div className="panel">
+              <div className="panel panel-black">
                 <div className="panel-header">
                   <span className="title">
                     📝 메모 · user_defined_memo.md{memoDirty ? ' ●' : ''}
@@ -269,7 +269,7 @@ export function App() {
               defaultSize={config?.ui.panels.editorHeight ?? 40}
               minSize={15}
             >
-              <div className="panel">
+              <div className="panel panel-black">
                 <div className="panel-header">
                   <span className="title">📝 에디터</span>
                 </div>
@@ -285,7 +285,7 @@ export function App() {
               defaultSize={config?.ui.panels.claudeTerminalHeight ?? 30}
               minSize={10}
             >
-              <div className="panel">
+              <div className="panel panel-black">
                 <div className="panel-header">
                   <span className="title">▲ PowerShell + Claude</span>
                 </div>
@@ -314,7 +314,7 @@ export function App() {
               defaultSize={config?.ui.panels.plainTerminalHeight ?? 30}
               minSize={10}
             >
-              <div className="panel">
+              <div className="panel panel-black">
                 <div className="panel-header">
                   <span className="title">▼ PowerShell</span>
                 </div>

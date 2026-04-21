@@ -17,10 +17,10 @@ function readCssVar(name: string, fallback: string): string {
 
 function buildTheme(): ITheme {
   return {
-    background: readCssVar('--bg-1', '#1a1f24'),
+    background: '#000000',
     foreground: readCssVar('--text-0', '#e6edf3'),
     cursor: readCssVar('--accent', '#36b289'),
-    cursorAccent: readCssVar('--bg-1', '#1a1f24'),
+    cursorAccent: '#000000',
     selectionBackground: readCssVar('--bg-active', '#2a3138')
   }
 }
@@ -61,6 +61,46 @@ export function Terminal({ folderPath, kind }: Props) {
     })
     ro.observe(container)
 
+    // 복사/붙여넣기 키바인딩. Ctrl+C/V를 쓰면 shell의 SIGINT/쓰기와 충돌하므로
+    // Windows Terminal 관례인 Ctrl+Shift+C/V 사용.
+    term.attachCustomKeyEventHandler((e) => {
+      if (e.type !== 'keydown') return true
+      const key = e.key.toLowerCase()
+      if (e.ctrlKey && e.shiftKey && !e.altKey && key === 'c') {
+        const sel = term.getSelection()
+        if (sel) navigator.clipboard.writeText(sel).catch(() => {})
+        return false
+      }
+      if (e.ctrlKey && e.shiftKey && !e.altKey && key === 'v') {
+        navigator.clipboard
+          .readText()
+          .then((text) => {
+            if (ptyId && text) window.api.pty.write(ptyId, text)
+          })
+          .catch(() => {})
+        return false
+      }
+      return true
+    })
+
+    // 우클릭: 선택된 텍스트 있으면 복사, 없으면 붙여넣기 (PuTTY/Windows Terminal 관례).
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault()
+      const sel = term.getSelection()
+      if (sel) {
+        navigator.clipboard.writeText(sel).catch(() => {})
+        term.clearSelection()
+      } else {
+        navigator.clipboard
+          .readText()
+          .then((text) => {
+            if (ptyId && text) window.api.pty.write(ptyId, text)
+          })
+          .catch(() => {})
+      }
+    }
+    container.addEventListener('contextmenu', handleContextMenu)
+
     ;(async () => {
       try {
         const id = await window.api.pty.create({
@@ -95,6 +135,7 @@ export function Terminal({ folderPath, kind }: Props) {
       cancelled = true
       cancelAnimationFrame(initialFitHandle)
       ro.disconnect()
+      container.removeEventListener('contextmenu', handleContextMenu)
       inputDisposable?.dispose()
       resizeDisposable?.dispose()
       disposeData?.()
