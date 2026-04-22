@@ -40,6 +40,19 @@ const api = {
     save: (projectPath: string, content: string): Promise<void> =>
       ipcRenderer.invoke(IpcChannel.MemoSave, projectPath, content)
   },
+  file: {
+    read: (
+      projectRoot: string,
+      filePath: string
+    ): Promise<{ content: string; sizeBytes: number }> =>
+      ipcRenderer.invoke(IpcChannel.FileRead, projectRoot, filePath),
+    save: (
+      projectRoot: string,
+      filePath: string,
+      content: string
+    ): Promise<void> =>
+      ipcRenderer.invoke(IpcChannel.FileSave, projectRoot, filePath, content)
+  },
   pty: {
     create: (opts: PtyCreateOptions): Promise<string> =>
       ipcRenderer.invoke(IpcChannel.PtyCreate, opts),

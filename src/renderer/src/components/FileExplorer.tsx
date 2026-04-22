@@ -3,6 +3,8 @@ import type { FileNode, FsChangeEvent } from '@shared/types'
 
 interface Props {
   rootPath: string
+  onFileOpen: (filePath: string) => void
+  selectedFilePath: string | null
 }
 
 function dirname(p: string): string {
@@ -22,7 +24,7 @@ function insertSorted(arr: FileNode[], node: FileNode): FileNode[] {
   return next
 }
 
-export function FileExplorer({ rootPath }: Props) {
+export function FileExplorer({ rootPath, onFileOpen, selectedFilePath }: Props) {
   const [childrenByParent, setChildrenByParent] = useState<Map<string, FileNode[]>>(new Map())
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
@@ -112,10 +114,12 @@ export function FileExplorer({ rootPath }: Props) {
     })
   }, [])
 
-  const handleFileClick = useCallback((path: string) => {
-    // Phase 7에서 에디터 연동 예정. 현재는 로그만.
-    console.log('[file-click]', path)
-  }, [])
+  const handleFileClick = useCallback(
+    (path: string) => {
+      onFileOpen(path)
+    },
+    [onFileOpen]
+  )
 
   const rootChildren = useMemo(
     () => childrenByParent.get(rootPath) ?? [],
@@ -141,6 +145,7 @@ export function FileExplorer({ rootPath }: Props) {
         expanded={expanded}
         onToggle={toggleExpand}
         onFileClick={handleFileClick}
+        selectedFilePath={selectedFilePath}
       />
     </div>
   )
@@ -153,6 +158,7 @@ interface TreeListProps {
   expanded: Set<string>
   onToggle: (path: string) => void
   onFileClick: (path: string) => void
+  selectedFilePath: string | null
 }
 
 function TreeList({
@@ -161,17 +167,19 @@ function TreeList({
   childrenByParent,
   expanded,
   onToggle,
-  onFileClick
+  onFileClick,
+  selectedFilePath
 }: TreeListProps) {
   return (
     <>
       {nodes.map((node) => {
         const isOpen = node.isDirectory && expanded.has(node.path)
         const children = isOpen ? childrenByParent.get(node.path) ?? [] : []
+        const isSelected = !node.isDirectory && node.path === selectedFilePath
         return (
           <div key={node.path}>
             <div
-              className={`tree-row${node.isDirectory ? ' dir' : ' file'}`}
+              className={`tree-row${node.isDirectory ? ' dir' : ' file'}${isSelected ? ' selected' : ''}`}
               style={{ paddingLeft: 8 + depth * 12 }}
               onClick={() =>
                 node.isDirectory ? onToggle(node.path) : onFileClick(node.path)
@@ -193,6 +201,7 @@ function TreeList({
                 expanded={expanded}
                 onToggle={onToggle}
                 onFileClick={onFileClick}
+                selectedFilePath={selectedFilePath}
               />
             )}
           </div>

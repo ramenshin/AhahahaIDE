@@ -11,6 +11,11 @@ import { Terminal } from './components/Terminal'
 import { SettingsModal } from './components/SettingsModal'
 import { FileExplorer } from './components/FileExplorer'
 import { MemoEditor } from './components/MemoEditor'
+import { CodeEditor } from './components/CodeEditor'
+
+function fileNameOf(p: string): string {
+  return p.split(/[\\/]/).pop() ?? p
+}
 
 export function App() {
   const [config, setConfig] = useState<AppConfig | null>(null)
@@ -22,6 +27,8 @@ export function App() {
   const [sessionError, setSessionError] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [memoDirty, setMemoDirty] = useState(false)
+  const [openedFile, setOpenedFile] = useState<string | null>(null)
+  const [editorDirty, setEditorDirty] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -165,6 +172,11 @@ export function App() {
 
   const activeFolder = folders.find((f) => f.path === activePath) ?? null
 
+  useEffect(() => {
+    setOpenedFile(null)
+    setEditorDirty(false)
+  }, [activeFolder?.path])
+
   const openProjects = useMemo(
     () =>
       openPaths.map((path) => {
@@ -220,7 +232,11 @@ export function App() {
                       </span>
                     </div>
                     {activeFolder ? (
-                      <FileExplorer rootPath={activeFolder.path} />
+                      <FileExplorer
+                        rootPath={activeFolder.path}
+                        onFileOpen={setOpenedFile}
+                        selectedFilePath={openedFile}
+                      />
                     ) : (
                       <Placeholder
                         phase="Phase 3"
@@ -271,13 +287,29 @@ export function App() {
             >
               <div className="panel panel-black">
                 <div className="panel-header">
-                  <span className="title">📝 에디터</span>
+                  <span className="title">
+                    📝 에디터
+                    {openedFile ? ` · ${fileNameOf(openedFile)}${editorDirty ? ' ●' : ''}` : ''}
+                  </span>
                 </div>
-                <Placeholder
-                  phase="Phase 1.5 / 차후"
-                  title="Monaco 코드 에디터"
-                  description="파일 클릭 시 선택 파일을 편집합니다. Ctrl+S 저장, 미저장 ● 표시."
-                />
+                {activeFolder && openedFile ? (
+                  <CodeEditor
+                    key={openedFile}
+                    projectRoot={activeFolder.path}
+                    filePath={openedFile}
+                    onDirtyChange={setEditorDirty}
+                  />
+                ) : (
+                  <Placeholder
+                    phase="Phase 7"
+                    title="Monaco 코드 에디터"
+                    description={
+                      activeFolder
+                        ? '좌측 파일 탐색기에서 파일을 클릭하세요. Ctrl+S 저장, 미저장 ● 표시.'
+                        : '프로젝트를 선택하면 파일을 열 수 있습니다.'
+                    }
+                  />
+                )}
               </div>
             </Panel>
             <PanelResizeHandle className="resize-handle-h" />

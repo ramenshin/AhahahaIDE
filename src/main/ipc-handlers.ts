@@ -6,6 +6,7 @@ import { loadConfig, saveConfig } from './state-store'
 import { closePty, createPty, resizePty, writePty } from './pty-manager'
 import { startWatch, stopWatch } from './file-watcher'
 import { loadMemo, saveMemo } from './memo-store'
+import { readTextFile, writeTextFile } from './file-store'
 
 export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.ScanFolders, async () => {
@@ -90,6 +91,20 @@ export function registerIpcHandlers(): void {
     IpcChannel.MemoSave,
     async (_event, projectPath: string, content: string): Promise<void> => {
       await saveMemo(projectPath, content)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannel.FileRead,
+    async (_event, projectRoot: string, filePath: string) => {
+      return readTextFile(projectRoot, filePath)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannel.FileSave,
+    async (_event, projectRoot: string, filePath: string, content: string) => {
+      await writeTextFile(projectRoot, filePath, content)
     }
   )
 

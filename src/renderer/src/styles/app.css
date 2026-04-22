@@ -298,6 +298,33 @@ body {
   font-size: 12px;
 }
 
+/* === CODE EDITOR === */
+.code-editor-host {
+  flex: 1;
+  min-height: 0;
+  background: #000000;
+  overflow: hidden;
+}
+.code-editor-loading {
+  flex: 1;
+  padding: 20px;
+  color: var(--text-2);
+  font-size: 12px;
+  font-style: italic;
+}
+.code-editor-error {
+  flex: 1;
+  padding: 20px;
+  color: var(--red);
+  font-size: 12px;
+}
+.code-editor-error-path {
+  margin-top: 6px;
+  color: var(--text-2);
+  font-size: 11px;
+  word-break: break-all;
+}
+
 /* === FILE EXPLORER === */
 .file-explorer {
   padding: 4px 0;
@@ -329,6 +356,10 @@ body {
 }
 .tree-row:hover { background: var(--bg-hover); }
 .tree-row.file:hover .tree-name { color: var(--accent-bright); }
+.tree-row.selected {
+  background: var(--bg-selected, rgba(255, 255, 255, 0.08));
+}
+.tree-row.selected .tree-name { color: var(--accent-bright); }
 .tree-caret {
   width: 10px;
   color: var(--text-2);
