@@ -172,6 +172,14 @@ export function App() {
 
   const activeFolder = folders.find((f) => f.path === activePath) ?? null
 
+  // openedFile이 현재 activeFolder 내부일 때만 유효. 탭 전환 직후 stale 렌더 방지
+  // (projectRoot만 먼저 바뀌고 openedFile은 useEffect로 뒤늦게 리셋되는 사이에
+  //  CodeEditor가 mismatched props로 file:read/save 를 쏴 "outside project root" 에러를 내던 문제).
+  const effectiveOpenedFile = useMemo(() => {
+    if (!activeFolder || !openedFile) return null
+    return openedFile.startsWith(activeFolder.path) ? openedFile : null
+  }, [activeFolder, openedFile])
+
   useEffect(() => {
     setOpenedFile(null)
     setEditorDirty(false)
@@ -235,7 +243,7 @@ export function App() {
                       <FileExplorer
                         rootPath={activeFolder.path}
                         onFileOpen={setOpenedFile}
-                        selectedFilePath={openedFile}
+                        selectedFilePath={effectiveOpenedFile}
                       />
                     ) : (
                       <Placeholder
@@ -289,14 +297,16 @@ export function App() {
                 <div className="panel-header">
                   <span className="title">
                     📝 에디터
-                    {openedFile ? ` · ${fileNameOf(openedFile)}${editorDirty ? ' ●' : ''}` : ''}
+                    {effectiveOpenedFile
+                      ? ` · ${fileNameOf(effectiveOpenedFile)}${editorDirty ? ' ●' : ''}`
+                      : ''}
                   </span>
                 </div>
-                {activeFolder && openedFile ? (
+                {activeFolder && effectiveOpenedFile ? (
                   <CodeEditor
-                    key={openedFile}
+                    key={effectiveOpenedFile}
                     projectRoot={activeFolder.path}
-                    filePath={openedFile}
+                    filePath={effectiveOpenedFile}
                     onDirtyChange={setEditorDirty}
                   />
                 ) : (
