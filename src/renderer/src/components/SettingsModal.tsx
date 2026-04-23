@@ -4,6 +4,8 @@ import { MAX_SESSIONS_LIMIT, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP, clampZoom } from '@s
 
 interface Props {
   config: AppConfig
+  // 부팅 시 결정된 렌더 레이아웃. 저장된 레이아웃과 다르면 "재시작 대기" 뱃지.
+  initialLayoutMode: LayoutMode | null
   onClose: () => void
   onSave: (next: AppConfig) => void | Promise<void>
 }
@@ -40,7 +42,7 @@ function parseExcludeText(text: string): string[] {
   )
 }
 
-export function SettingsModal({ config, onClose, onSave }: Props) {
+export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Props) {
   const originalZoom = config.ui.zoomFactor
   const originalScheme = config.ui.colorScheme
   const [draftZoom, setDraftZoom] = useState<number>(originalZoom)
@@ -101,11 +103,24 @@ export function SettingsModal({ config, onClose, onSave }: Props) {
   }
 
   const handleSave = async () => {
-    setSaving(true)
     const clampedSessions = Math.min(
       MAX_SESSIONS_LIMIT,
       Math.max(1, Math.round(draftMaxSessions))
     )
+    let finalLayoutMode = draftLayoutMode
+    // 레이아웃이 바뀌었으면 Y/N 확인. N이면 레이아웃만 원복하고 나머지는 저장.
+    if (draftLayoutMode !== config.ui.layoutMode) {
+      const ok = window.confirm(
+        '레이아웃을 변경하면 앱을 재시작해야 새 레이아웃이 적용됩니다.\n' +
+          '현재 세션(터미널/에디터)은 유지됩니다.\n\n' +
+          '변경하시겠습니까?'
+      )
+      if (!ok) {
+        finalLayoutMode = config.ui.layoutMode
+        setDraftLayoutMode(config.ui.layoutMode)
+      }
+    }
+    setSaving(true)
     const next: AppConfig = {
       ...config,
       rootPath: draftRootPath,
@@ -115,7 +130,7 @@ export function SettingsModal({ config, onClose, onSave }: Props) {
         ...config.ui,
         zoomFactor: clampZoom(draftZoom),
         colorScheme: draftScheme,
-        layoutMode: draftLayoutMode
+        layoutMode: finalLayoutMode
       }
     }
     try {
@@ -125,6 +140,11 @@ export function SettingsModal({ config, onClose, onSave }: Props) {
       setSaving(false)
     }
   }
+
+  // 저장된 레이아웃(config.ui.layoutMode) ≠ 부팅 시 적용된 레이아웃(initialLayoutMode)
+  // 이면 재시작 대기 중. 사용자에게 명시.
+  const layoutRestartPending =
+    initialLayoutMode !== null && initialLayoutMode !== config.ui.layoutMode
 
   const pct = Math.round(draftZoom * 100)
 
@@ -254,9 +274,17 @@ export function SettingsModal({ config, onClose, onSave }: Props) {
           </section>
 
           <section className="settings-section">
-            <h3 className="settings-section-title">화면 · 작업공간 레이아웃</h3>
+            <h3 className="settings-section-title">
+              화면 · 작업공간 레이아웃
+              {layoutRestartPending && (
+                <span className="restart-badge" title="앱 재시작 후 적용됩니다">
+                  ⏱ 재시작 대기 중
+                </span>
+              )}
+            </h3>
             <p className="settings-hint">
-              에디터 · Claude · PowerShell 3개 패널의 배치 방식. 변경 후 저장하면 즉시 반영됩니다.
+              에디터 · Claude · PowerShell 3개 패널의 배치. 변경 시 Y/N 확인 후 저장되며,
+              <b> 앱을 재시작해야 새 레이아웃이 적용</b>됩니다. 현재 세션은 유지됩니다.
             </p>
             <div className="layout-options">
               {LAYOUT_META.map((m) => (
@@ -278,9 +306,11 @@ export function SettingsModal({ config, onClose, onSave }: Props) {
                 </label>
               ))}
             </div>
-            <p className="settings-hint warn">
-              ⚠ 실제 레이아웃 전환은 다음 단계(Phase 8-B)에서 구현됩니다. 현재는 설정만 저장됩니다.
-            </p>
+            {layoutRestartPending && (
+              <p className="settings-hint warn">
+                ⚠ 저장된 레이아웃과 현재 렌더 중인 레이아웃이 다릅니다. 앱을 재시작하세요.
+              </p>
+            )}
           </section>
         </div>
         <div className="modal-footer">

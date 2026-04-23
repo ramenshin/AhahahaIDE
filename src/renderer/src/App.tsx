@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
-import type { AppConfig, ProjectFolder } from '@shared/types'
+import type { AppConfig, LayoutMode, ProjectFolder } from '@shared/types'
 import { ZOOM_STEP, clampZoom } from '@shared/types'
 import { TopBar } from './components/TopBar'
 import { ProjectTabBar } from './components/ProjectTabBar'
@@ -17,8 +17,83 @@ function fileNameOf(p: string): string {
   return p.split(/[\\/]/).pop() ?? p
 }
 
+interface WorkspaceRenderOpts {
+  mode: LayoutMode
+  layouts: AppConfig['ui']['panels']['layouts'] | undefined
+  editorPane: ReactNode
+  claudePane: ReactNode
+  plainPane: ReactNode
+}
+
+function renderWorkspace({
+  mode,
+  layouts,
+  editorPane,
+  claudePane,
+  plainPane
+}: WorkspaceRenderOpts): ReactNode {
+  if (mode === 'col3') {
+    const s = layouts?.col3
+    return (
+      <PanelGroup direction="horizontal">
+        <Panel defaultSize={s?.editorWidth ?? 40} minSize={15}>
+          {editorPane}
+        </Panel>
+        <PanelResizeHandle className="resize-handle-v" />
+        <Panel defaultSize={s?.claudeTerminalWidth ?? 30} minSize={15}>
+          {claudePane}
+        </Panel>
+        <PanelResizeHandle className="resize-handle-v" />
+        <Panel defaultSize={s?.plainTerminalWidth ?? 30} minSize={15}>
+          {plainPane}
+        </Panel>
+      </PanelGroup>
+    )
+  }
+  if (mode === 'rowcol') {
+    const s = layouts?.rowcol
+    return (
+      <PanelGroup direction="vertical">
+        <Panel defaultSize={s?.editorHeight ?? 40} minSize={15}>
+          {editorPane}
+        </Panel>
+        <PanelResizeHandle className="resize-handle-h" />
+        <Panel minSize={15}>
+          <PanelGroup direction="horizontal">
+            <Panel defaultSize={s?.claudeTerminalWidth ?? 50} minSize={20}>
+              {claudePane}
+            </Panel>
+            <PanelResizeHandle className="resize-handle-v" />
+            <Panel minSize={20}>{plainPane}</Panel>
+          </PanelGroup>
+        </Panel>
+      </PanelGroup>
+    )
+  }
+  // row3 (default)
+  const s = layouts?.row3
+  return (
+    <PanelGroup direction="vertical">
+      <Panel defaultSize={s?.editorHeight ?? 40} minSize={15}>
+        {editorPane}
+      </Panel>
+      <PanelResizeHandle className="resize-handle-h" />
+      <Panel defaultSize={s?.claudeTerminalHeight ?? 30} minSize={10}>
+        {claudePane}
+      </Panel>
+      <PanelResizeHandle className="resize-handle-h" />
+      <Panel defaultSize={s?.plainTerminalHeight ?? 30} minSize={10}>
+        {plainPane}
+      </Panel>
+    </PanelGroup>
+  )
+}
+
 export function App() {
   const [config, setConfig] = useState<AppConfig | null>(null)
+  // 부팅 시 한 번만 결정하는 렌더 레이아웃. 런타임에 변하지 않음 — 설정에서 변경하면
+  // config.ui.layoutMode만 바뀌고 다음 재시작부터 반영됨.
+  const [initialLayoutMode, setInitialLayoutMode] = useState<LayoutMode | null>(null)
   const [folders, setFolders] = useState<ProjectFolder[]>([])
   const [loading, setLoading] = useState(true)
   const [scanError, setScanError] = useState<string | null>(null)
@@ -40,6 +115,7 @@ export function App() {
         ])
         if (cancelled) return
         setConfig(cfg)
+        setInitialLayoutMode(cfg.ui.layoutMode)
         document.body.className = `scheme-${cfg.ui.colorScheme}`
         window.api.setZoom(cfg.ui.zoomFactor)
         setFolders(scan.folders)
@@ -198,6 +274,89 @@ export function App() {
     [openPaths, folders]
   )
 
+  const editorPane: ReactNode = (
+    <div className="panel panel-black">
+      <div className="panel-header">
+        <span className="title">
+          📝 에디터
+          {effectiveOpenedFile
+            ? ` · ${fileNameOf(effectiveOpenedFile)}${editorDirty ? ' ●' : ''}`
+            : ''}
+        </span>
+      </div>
+      {activeFolder && effectiveOpenedFile ? (
+        <CodeEditor
+          key={effectiveOpenedFile}
+          projectRoot={activeFolder.path}
+          filePath={effectiveOpenedFile}
+          onDirtyChange={setEditorDirty}
+        />
+      ) : (
+        <Placeholder
+          phase="Phase 7"
+          title="Monaco 코드 에디터"
+          description={
+            activeFolder
+              ? '좌측 파일 탐색기에서 파일을 클릭하세요. Ctrl+S 저장, 미저장 ● 표시.'
+              : '프로젝트를 선택하면 파일을 열 수 있습니다.'
+          }
+        />
+      )}
+    </div>
+  )
+
+  const claudePane: ReactNode = (
+    <div className="panel panel-black">
+      <div className="panel-header">
+        <span className="title">▲ PowerShell + Claude</span>
+      </div>
+      {openPaths.length === 0 ? (
+        <Placeholder
+          phase="Phase 2"
+          title="Claude 터미널"
+          description="좌측에서 프로젝트 폴더를 클릭하면 PowerShell + Claude가 실행됩니다."
+        />
+      ) : (
+        <div className="terminal-stack">
+          {openPaths.map((p) => (
+            <div
+              key={p}
+              className={`terminal-slot${p === activePath ? ' active' : ''}`}
+            >
+              <Terminal folderPath={p} kind="claude" />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+
+  const plainPane: ReactNode = (
+    <div className="panel panel-black">
+      <div className="panel-header">
+        <span className="title">▼ PowerShell</span>
+      </div>
+      {openPaths.length === 0 ? (
+        <Placeholder
+          phase="Phase 2"
+          title="일반 터미널"
+          description="프로젝트를 열면 venv 활성화된 PowerShell이 실행됩니다."
+        />
+      ) : (
+        <div className="terminal-stack">
+          {openPaths.map((p) => (
+            <div
+              key={p}
+              className={`terminal-slot${p === activePath ? ' active' : ''}`}
+            >
+              <Terminal folderPath={p} kind="plain" />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <div className="app">
       <TopBar onOpenSettings={() => setSettingsOpen(true)} />
@@ -288,99 +447,13 @@ export function App() {
         <PanelResizeHandle className="resize-handle-v" />
 
         <Panel minSize={35}>
-          <PanelGroup direction="vertical">
-            <Panel
-              defaultSize={config?.ui.panels.layouts.row3.editorHeight ?? 40}
-              minSize={15}
-            >
-              <div className="panel panel-black">
-                <div className="panel-header">
-                  <span className="title">
-                    📝 에디터
-                    {effectiveOpenedFile
-                      ? ` · ${fileNameOf(effectiveOpenedFile)}${editorDirty ? ' ●' : ''}`
-                      : ''}
-                  </span>
-                </div>
-                {activeFolder && effectiveOpenedFile ? (
-                  <CodeEditor
-                    key={effectiveOpenedFile}
-                    projectRoot={activeFolder.path}
-                    filePath={effectiveOpenedFile}
-                    onDirtyChange={setEditorDirty}
-                  />
-                ) : (
-                  <Placeholder
-                    phase="Phase 7"
-                    title="Monaco 코드 에디터"
-                    description={
-                      activeFolder
-                        ? '좌측 파일 탐색기에서 파일을 클릭하세요. Ctrl+S 저장, 미저장 ● 표시.'
-                        : '프로젝트를 선택하면 파일을 열 수 있습니다.'
-                    }
-                  />
-                )}
-              </div>
-            </Panel>
-            <PanelResizeHandle className="resize-handle-h" />
-            <Panel
-              defaultSize={config?.ui.panels.layouts.row3.claudeTerminalHeight ?? 30}
-              minSize={10}
-            >
-              <div className="panel panel-black">
-                <div className="panel-header">
-                  <span className="title">▲ PowerShell + Claude</span>
-                </div>
-                {openPaths.length === 0 ? (
-                  <Placeholder
-                    phase="Phase 2"
-                    title="Claude 터미널"
-                    description="좌측에서 프로젝트 폴더를 클릭하면 PowerShell + Claude가 실행됩니다."
-                  />
-                ) : (
-                  <div className="terminal-stack">
-                    {openPaths.map((p) => (
-                      <div
-                        key={p}
-                        className={`terminal-slot${p === activePath ? ' active' : ''}`}
-                      >
-                        <Terminal folderPath={p} kind="claude" />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Panel>
-            <PanelResizeHandle className="resize-handle-h" />
-            <Panel
-              defaultSize={config?.ui.panels.layouts.row3.plainTerminalHeight ?? 30}
-              minSize={10}
-            >
-              <div className="panel panel-black">
-                <div className="panel-header">
-                  <span className="title">▼ PowerShell</span>
-                </div>
-                {openPaths.length === 0 ? (
-                  <Placeholder
-                    phase="Phase 2"
-                    title="일반 터미널"
-                    description="프로젝트를 열면 venv 활성화된 PowerShell이 실행됩니다."
-                  />
-                ) : (
-                  <div className="terminal-stack">
-                    {openPaths.map((p) => (
-                      <div
-                        key={p}
-                        className={`terminal-slot${p === activePath ? ' active' : ''}`}
-                      >
-                        <Terminal folderPath={p} kind="plain" />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Panel>
-          </PanelGroup>
+          {renderWorkspace({
+            mode: initialLayoutMode ?? 'row3',
+            layouts: config?.ui.panels.layouts,
+            editorPane,
+            claudePane,
+            plainPane
+          })}
         </Panel>
       </PanelGroup>
       {sessionError && (
@@ -397,6 +470,7 @@ export function App() {
       {settingsOpen && config && (
         <SettingsModal
           config={config}
+          initialLayoutMode={initialLayoutMode}
           onClose={() => setSettingsOpen(false)}
           onSave={handleSaveSettings}
         />
