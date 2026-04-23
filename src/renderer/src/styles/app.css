@@ -565,6 +565,60 @@ body {
   font-family: monospace;
   padding: 0 2px;
 }
+.max-sessions-input {
+  width: 80px;
+  padding: 4px 8px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text-0);
+  border-radius: 4px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.max-sessions-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.layout-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.layout-option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--bg-1);
+}
+.layout-option:hover {
+  border-color: var(--accent);
+}
+.layout-option.selected {
+  border-color: var(--accent-bright);
+  background: var(--bg-2);
+}
+.layout-option input[type='radio'] {
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+.layout-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.layout-option-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-0);
+}
+.layout-option-hint {
+  font-size: 11px;
+  color: var(--text-2);
+}
 .btn-primary,
 .btn-secondary,
 .btn-ghost {

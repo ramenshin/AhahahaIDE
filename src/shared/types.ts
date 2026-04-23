@@ -13,7 +13,27 @@ export interface FolderScanResult {
   scannedAt: number
 }
 
+export type LayoutMode = 'row3' | 'col3' | 'rowcol'
+
+export interface LayoutSizes {
+  row3: {
+    editorHeight: number
+    claudeTerminalHeight: number
+    plainTerminalHeight: number
+  }
+  col3: {
+    editorWidth: number
+    claudeTerminalWidth: number
+    plainTerminalWidth: number
+  }
+  rowcol: {
+    editorHeight: number
+    claudeTerminalWidth: number
+  }
+}
+
 export interface AppConfig {
+  schemaVersion?: number
   rootPath: string
   excludePatterns: string[]
   maxSessions: number
@@ -22,13 +42,12 @@ export interface AppConfig {
     colorScheme: ColorScheme
     showGitBranch: boolean
     zoomFactor: number
+    layoutMode: LayoutMode
     panels: {
       leftWidth: number
       folderListWidth: number
       memoHeight: number
-      editorHeight: number
-      claudeTerminalHeight: number
-      plainTerminalHeight: number
+      layouts: LayoutSizes
     }
   }
   hibernate: {
@@ -43,6 +62,9 @@ export interface AppConfig {
 }
 
 export type ColorScheme = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
+
+export const CONFIG_SCHEMA_VERSION = 2
+export const MAX_SESSIONS_LIMIT = 20
 
 export const ZOOM_MIN = 0.8
 export const ZOOM_MAX = 1.5
@@ -93,22 +115,39 @@ export interface FsChangeEvent {
   isDirectory: boolean
 }
 
+export const DEFAULT_LAYOUT_SIZES: LayoutSizes = {
+  row3: {
+    editorHeight: 40,
+    claudeTerminalHeight: 30,
+    plainTerminalHeight: 30
+  },
+  col3: {
+    editorWidth: 40,
+    claudeTerminalWidth: 30,
+    plainTerminalWidth: 30
+  },
+  rowcol: {
+    editorHeight: 40,
+    claudeTerminalWidth: 50
+  }
+}
+
 export const DEFAULT_CONFIG: AppConfig = {
+  schemaVersion: CONFIG_SCHEMA_VERSION,
   rootPath: 'D:\\Projects',
   excludePatterns: ['venv', 'node_modules', '.git', '__pycache__', '.pytest_cache', '.vite', 'dist', 'out', 'build'],
-  maxSessions: 20,
+  maxSessions: 5,
   startupMode: 'restore',
   ui: {
     colorScheme: 'd',
     showGitBranch: true,
-    zoomFactor: 1.0,
+    zoomFactor: 1.1,
+    layoutMode: 'row3',
     panels: {
       leftWidth: 32,
       folderListWidth: 42,
       memoHeight: 30,
-      editorHeight: 40,
-      claudeTerminalHeight: 30,
-      plainTerminalHeight: 30
+      layouts: DEFAULT_LAYOUT_SIZES
     }
   },
   hibernate: {

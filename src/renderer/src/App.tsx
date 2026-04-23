@@ -290,7 +290,7 @@ export function App() {
         <Panel minSize={35}>
           <PanelGroup direction="vertical">
             <Panel
-              defaultSize={config?.ui.panels.editorHeight ?? 40}
+              defaultSize={config?.ui.panels.layouts.row3.editorHeight ?? 40}
               minSize={15}
             >
               <div className="panel panel-black">
@@ -324,7 +324,7 @@ export function App() {
             </Panel>
             <PanelResizeHandle className="resize-handle-h" />
             <Panel
-              defaultSize={config?.ui.panels.claudeTerminalHeight ?? 30}
+              defaultSize={config?.ui.panels.layouts.row3.claudeTerminalHeight ?? 30}
               minSize={10}
             >
               <div className="panel panel-black">
@@ -353,7 +353,7 @@ export function App() {
             </Panel>
             <PanelResizeHandle className="resize-handle-h" />
             <Panel
-              defaultSize={config?.ui.panels.plainTerminalHeight ?? 30}
+              defaultSize={config?.ui.panels.layouts.row3.plainTerminalHeight ?? 30}
               minSize={10}
             >
               <div className="panel panel-black">

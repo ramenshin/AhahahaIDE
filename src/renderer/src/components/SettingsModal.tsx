@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { AppConfig, ColorScheme } from '@shared/types'
-import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP, clampZoom } from '@shared/types'
+import type { AppConfig, ColorScheme, LayoutMode } from '@shared/types'
+import { MAX_SESSIONS_LIMIT, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP, clampZoom } from '@shared/types'
 
 interface Props {
   config: AppConfig
   onClose: () => void
   onSave: (next: AppConfig) => void | Promise<void>
 }
+
+const LAYOUT_META: { id: LayoutMode; label: string; hint: string }[] = [
+  { id: 'row3', label: '가로 3단 (상/중/하)', hint: '에디터 · Claude · PowerShell 을 위→아래 3단' },
+  { id: 'col3', label: '세로 3열 (좌/중/우)', hint: '에디터 · Claude · PowerShell 을 좌→우 3열' },
+  { id: 'rowcol', label: '에디터 위 · Claude|PS 아래 2열', hint: '상단=에디터, 하단을 Claude · PowerShell 로 2열 분할' }
+]
 
 const SCHEME_META: { id: ColorScheme; label: string; hint: string }[] = [
   { id: 'a', label: 'A', hint: '라벤더 블루' },
@@ -40,6 +46,8 @@ export function SettingsModal({ config, onClose, onSave }: Props) {
   const [draftZoom, setDraftZoom] = useState<number>(originalZoom)
   const [draftScheme, setDraftScheme] = useState<ColorScheme>(originalScheme)
   const [draftRootPath, setDraftRootPath] = useState<string>(config.rootPath)
+  const [draftMaxSessions, setDraftMaxSessions] = useState<number>(config.maxSessions)
+  const [draftLayoutMode, setDraftLayoutMode] = useState<LayoutMode>(config.ui.layoutMode)
   const [excludeText, setExcludeText] = useState<string>(
     config.excludePatterns.join('\n')
   )
@@ -94,14 +102,20 @@ export function SettingsModal({ config, onClose, onSave }: Props) {
 
   const handleSave = async () => {
     setSaving(true)
+    const clampedSessions = Math.min(
+      MAX_SESSIONS_LIMIT,
+      Math.max(1, Math.round(draftMaxSessions))
+    )
     const next: AppConfig = {
       ...config,
       rootPath: draftRootPath,
       excludePatterns,
+      maxSessions: clampedSessions,
       ui: {
         ...config.ui,
         zoomFactor: clampZoom(draftZoom),
-        colorScheme: draftScheme
+        colorScheme: draftScheme,
+        layoutMode: draftLayoutMode
       }
     }
     try {
@@ -218,6 +232,55 @@ export function SettingsModal({ config, onClose, onSave }: Props) {
             {excludeChanged && (
               <p className="settings-hint">저장 시 {excludePatterns.length}개 패턴 적용.</p>
             )}
+          </section>
+
+          <section className="settings-section">
+            <h3 className="settings-section-title">프로젝트 · 최대 동시 세션</h3>
+            <p className="settings-hint">
+              동시에 열 수 있는 프로젝트 탭 수. 1~{MAX_SESSIONS_LIMIT}개.
+            </p>
+            <div className="zoom-row">
+              <input
+                type="number"
+                min={1}
+                max={MAX_SESSIONS_LIMIT}
+                step={1}
+                value={draftMaxSessions}
+                onChange={(e) => setDraftMaxSessions(parseInt(e.target.value, 10) || 1)}
+                className="max-sessions-input"
+              />
+              <span className="settings-hint">개</span>
+            </div>
+          </section>
+
+          <section className="settings-section">
+            <h3 className="settings-section-title">화면 · 작업공간 레이아웃</h3>
+            <p className="settings-hint">
+              에디터 · Claude · PowerShell 3개 패널의 배치 방식. 변경 후 저장하면 즉시 반영됩니다.
+            </p>
+            <div className="layout-options">
+              {LAYOUT_META.map((m) => (
+                <label
+                  key={m.id}
+                  className={`layout-option${draftLayoutMode === m.id ? ' selected' : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="layoutMode"
+                    value={m.id}
+                    checked={draftLayoutMode === m.id}
+                    onChange={() => setDraftLayoutMode(m.id)}
+                  />
+                  <div className="layout-option-body">
+                    <div className="layout-option-label">{m.label}</div>
+                    <div className="layout-option-hint">{m.hint}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <p className="settings-hint warn">
+              ⚠ 실제 레이아웃 전환은 다음 단계(Phase 8-B)에서 구현됩니다. 현재는 설정만 저장됩니다.
+            </p>
           </section>
         </div>
         <div className="modal-footer">
