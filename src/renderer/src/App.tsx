@@ -13,6 +13,11 @@ import { FileExplorer } from './components/FileExplorer'
 import { MemoEditor } from './components/MemoEditor'
 import { CodeEditor, type EditorFlushHandle } from './components/CodeEditor'
 import { NewProjectModal } from './components/NewProjectModal'
+import {
+  QuikSearchModal,
+  type QuikSearchMode,
+  type QuikSelection
+} from './components/QuikSearchModal'
 
 function fileNameOf(p: string): string {
   return p.split(/[\\/]/).pop() ?? p
@@ -103,6 +108,8 @@ export function App() {
   const [sessionError, setSessionError] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [newProjectOpen, setNewProjectOpen] = useState(false)
+  const [quikSearchMode, setQuikSearchMode] = useState<QuikSearchMode | null>(null)
+  const [pendingRevealLine, setPendingRevealLine] = useState<number | undefined>(undefined)
   const [memoDirty, setMemoDirty] = useState(false)
   const [openedFile, setOpenedFile] = useState<string | null>(null)
   const [editorDirty, setEditorDirty] = useState(false)
@@ -298,6 +305,61 @@ export function App() {
     [maxSessions]
   )
 
+  const handleQuikSelect = useCallback(
+    (sel: QuikSelection) => {
+      setQuikSearchMode(null)
+      const target = folders.find((f) => {
+        const fp = f.path
+        return (
+          sel.absPath === fp ||
+          sel.absPath.startsWith(fp + '\\') ||
+          sel.absPath.startsWith(fp + '/')
+        )
+      })
+      if (!target) {
+        setToast({
+          text: '선택한 파일이 어떤 프로젝트에도 속하지 않습니다.',
+          kind: 'error'
+        })
+        return
+      }
+      // 세션 오픈 + 활성 전환 + 파일/라인 설정 (배치)
+      setOpenPaths((prev) => {
+        if (prev.includes(target.path)) return prev
+        if (prev.length >= maxSessions) {
+          setSessionError(
+            `최대 세션 ${maxSessions}개에 도달했습니다. 탭을 닫고 다시 시도하세요.`
+          )
+          return prev
+        }
+        return [...prev, target.path]
+      })
+      setActivePath(target.path)
+      setOpenedFile(sel.absPath)
+      setEditorDirty(false)
+      setPendingRevealLine(sel.kind === 'content' ? sel.line : undefined)
+    },
+    [folders, maxSessions]
+  )
+
+  // Ctrl+P / Ctrl+Shift+F 글로벌 단축키 (모달 열려 있을 땐 비활성)
+  useEffect(() => {
+    if (settingsOpen || newProjectOpen || quikSearchMode !== null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.metaKey) return
+      const lower = e.key.toLowerCase()
+      if (e.ctrlKey && !e.shiftKey && lower === 'p') {
+        e.preventDefault()
+        setQuikSearchMode('filename')
+      } else if (e.ctrlKey && e.shiftKey && lower === 'f') {
+        e.preventDefault()
+        setQuikSearchMode('doc')
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [settingsOpen, newProjectOpen, quikSearchMode])
+
   const closeSession = useCallback(
     (path: string) => {
       setOpenPaths((prev) => {
@@ -323,8 +385,16 @@ export function App() {
   }, [activeFolder, openedFile])
 
   useEffect(() => {
-    setOpenedFile(null)
+    // 프로젝트 전환 시 기본은 openedFile 해제. 단, QuikSearch가 새 프로젝트로
+    // 점프하면서 같이 setOpenedFile을 미리 설정한 경우 그 파일이 새 활성 프로젝트
+    // 내부면 유지(아니면 cross-project stale로 간주해 정리).
+    setOpenedFile((prev) => {
+      if (!prev) return prev
+      if (!activeFolder) return null
+      return prev.startsWith(activeFolder.path) ? prev : null
+    })
     setEditorDirty(false)
+    setPendingRevealLine(undefined)
   }, [activeFolder?.path])
 
   const openProjects = useMemo(
@@ -356,6 +426,7 @@ export function App() {
           ref={codeEditorRef}
           projectRoot={activeFolder.path}
           filePath={effectiveOpenedFile}
+          initialLine={pendingRevealLine}
           onDirtyChange={setEditorDirty}
         />
       ) : (
@@ -430,6 +501,7 @@ export function App() {
         onOpenSettings={() => setSettingsOpen(true)}
         onSaveState={handleSaveState}
         onCreateProject={() => setNewProjectOpen(true)}
+        onOpenQuikSearch={() => setQuikSearchMode('filename')}
         hasOpenProjects={openPaths.length > 0}
         hasActiveProject={activePath !== null}
       />
@@ -546,6 +618,13 @@ export function App() {
         rootPath={config?.rootPath ?? ''}
         activeFolderName={activeFolder?.name ?? null}
       />
+      {quikSearchMode !== null && (
+        <QuikSearchModal
+          initialMode={quikSearchMode}
+          onClose={() => setQuikSearchMode(null)}
+          onSelect={handleQuikSelect}
+        />
+      )}
       {newProjectOpen && config && (
         <NewProjectModal
           rootPath={config.rootPath}

@@ -159,6 +159,134 @@ body {
   color: #e67e7e;
   font-size: 12px;
 }
+.quik-modal {
+  width: min(720px, 92vw);
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+.quik-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 8px 0 8px;
+}
+.quik-tab {
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-1);
+  cursor: pointer;
+  font-size: 12px;
+}
+.quik-tab:hover {
+  background: var(--bg-hover);
+}
+.quik-tab.selected {
+  background: var(--bg-2);
+  border-color: var(--accent);
+  color: var(--text-0);
+}
+.quik-tabs .spacer {
+  flex: 1;
+}
+.quik-input-wrap {
+  padding: 8px 12px 4px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.quik-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text-0);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Consolas, monospace;
+  box-sizing: border-box;
+}
+.quik-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.quik-input-meta {
+  font-size: 10px;
+  color: var(--text-2);
+  display: flex;
+  justify-content: flex-end;
+  font-family: monospace;
+}
+.quik-error {
+  margin: 0 12px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: rgba(192, 57, 43, 0.12);
+  border: 1px solid rgba(192, 57, 43, 0.6);
+  color: #e67e7e;
+  font-size: 12px;
+}
+.quik-results {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px 8px 8px;
+}
+.quik-row {
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.quik-row:hover {
+  background: var(--bg-hover);
+}
+.quik-row.selected {
+  background: var(--bg-2);
+  border-color: var(--accent);
+}
+.quik-row-main {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 13px;
+}
+.quik-row-name {
+  color: var(--text-0);
+  font-weight: 600;
+}
+.quik-row-line {
+  color: var(--accent-bright);
+  font-family: monospace;
+  font-size: 11px;
+}
+.quik-row-snippet {
+  margin-top: 2px;
+  font-family: Consolas, monospace;
+  font-size: 11px;
+  color: var(--text-1);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.quik-row-sub {
+  margin-top: 2px;
+  font-size: 10px;
+  color: var(--text-2);
+  font-family: monospace;
+  word-break: break-all;
+}
+.quik-hl {
+  color: var(--accent-bright);
+  font-weight: 700;
+}
+.quik-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-2);
+  font-size: 12px;
+}
 
 /* === PROJECT TAB BAR === */
 .project-tabs {

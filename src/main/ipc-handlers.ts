@@ -2,9 +2,15 @@ import { promises as fs } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { IpcChannel } from '@shared/ipc-channels'
-import type { AppConfig, PtyCreateOptions, PtyKind } from '@shared/types'
+import type {
+  AppConfig,
+  PtyCreateOptions,
+  PtyKind,
+  QuikContentMode
+} from '@shared/types'
 import { scanProjectFolders } from './folder-scanner'
 import { loadConfig, saveConfig } from './state-store'
+import { listFiles as quikListFiles, searchContent as quikSearchContent } from './quik-search'
 import {
   closePty,
   createPty,
@@ -155,6 +161,19 @@ export function registerIpcHandlers(): void {
     IpcChannel.FolderCreate,
     async (_event, name: string): Promise<string> => {
       return createProjectFolder(name)
+    }
+  )
+
+  ipcMain.handle(IpcChannel.QuikListFiles, async () => {
+    const config = await loadConfig()
+    return quikListFiles(config.rootPath, config.excludePatterns)
+  })
+
+  ipcMain.handle(
+    IpcChannel.QuikSearchContent,
+    async (_event, query: string, mode: QuikContentMode) => {
+      const config = await loadConfig()
+      return quikSearchContent(config.rootPath, config.excludePatterns, query, mode)
     }
   )
 

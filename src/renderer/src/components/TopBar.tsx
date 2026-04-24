@@ -6,6 +6,7 @@ interface Props {
   onOpenSettings: () => void
   onSaveState: (scope: SaveStateScope) => void
   onCreateProject: () => void
+  onOpenQuikSearch: () => void
   hasOpenProjects: boolean
   hasActiveProject: boolean
 }
@@ -14,6 +15,7 @@ export function TopBar({
   onOpenSettings,
   onSaveState,
   onCreateProject,
+  onOpenQuikSearch,
   hasOpenProjects,
   hasActiveProject
 }: Props) {
@@ -102,10 +104,10 @@ export function TopBar({
       <button
         className="btn"
         type="button"
-        disabled
-        title="곧 구현 예정 (Phase 8-E)"
+        onClick={onOpenQuikSearch}
+        title="파일명·문서·코드 검색 (Ctrl+P)"
       >
-        Quick Switch <span className="kbd">Ctrl+P</span>
+        🔍 QuikSearch <span className="kbd">Ctrl+P</span>
       </button>
       <button
         className="btn"

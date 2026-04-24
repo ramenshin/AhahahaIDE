@@ -77,6 +77,23 @@ export function clampZoom(value: number): number {
 
 export type PtyKind = 'claude' | 'plain'
 
+export type QuikContentMode = 'doc' | 'code'
+
+export interface QuikFileEntry {
+  relPath: string  // forward slashes, relative to root
+  absPath: string
+}
+
+export interface QuikContentMatch {
+  relPath: string
+  absPath: string
+  line: number  // 1-based
+  snippet: string
+}
+
+export const QUIK_MAX_FILE_BYTES = 50 * 1024 * 1024
+export const QUIK_MAX_RESULTS = 100
+
 export const CLAUDE_SAVE_STATE_PROMPT =
   '지금까지 진행한 작업 상태를 memory에 저장해 주세요. 다음에 이어서 진행할 수 있도록 현재 진행 중인 작업·미해결 TODO·의사결정 컨텍스트를 정리해 주세요.'
 

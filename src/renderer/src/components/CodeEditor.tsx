@@ -9,6 +9,8 @@ export interface EditorFlushHandle {
 interface Props {
   projectRoot: string
   filePath: string
+  // QuikSearch가 라인 매칭 결과를 클릭했을 때, 마운트+로드 후 해당 라인으로 점프
+  initialLine?: number
   onDirtyChange: (dirty: boolean) => void
 }
 
@@ -57,7 +59,7 @@ function fileNameOf(p: string): string {
 }
 
 export const CodeEditor = forwardRef<EditorFlushHandle, Props>(function CodeEditor(
-  { projectRoot, filePath, onDirtyChange },
+  { projectRoot, filePath, initialLine, onDirtyChange },
   ref
 ) {
   const [content, setContent] = useState<string>('')
@@ -123,6 +125,9 @@ export const CodeEditor = forwardRef<EditorFlushHandle, Props>(function CodeEdit
     }
   }, [])
 
+  // QuikSearch 매칭 라인으로 점프할 때 사용. handleMount에서 editor 인스턴스 보관.
+  const editorInstanceRef = useRef<Parameters<OnMount>[0] | null>(null)
+
   // 외부에서 호출 가능한 flush. App의 "상태저장" 버튼이 사용.
   useImperativeHandle(
     ref,
@@ -132,6 +137,20 @@ export const CodeEditor = forwardRef<EditorFlushHandle, Props>(function CodeEdit
     []
   )
 
+  // 로드 완료 + initialLine 있으면 해당 라인으로 점프. 마운트 재키잉 덕에 신규 파일마다 1회.
+  useEffect(() => {
+    if (!loaded || !initialLine) return
+    const ed = editorInstanceRef.current
+    if (!ed) return
+    try {
+      ed.revealLineInCenter(initialLine)
+      ed.setPosition({ lineNumber: initialLine, column: 1 })
+      ed.focus()
+    } catch {
+      // 라인 범위 밖 등은 무시
+    }
+  }, [loaded, initialLine])
+
   useEffect(() => {
     if (!loaded) return
     const dirty = content !== savedContentRef.current
@@ -139,6 +158,7 @@ export const CodeEditor = forwardRef<EditorFlushHandle, Props>(function CodeEdit
   }, [content, loaded, onDirtyChange])
 
   const handleMount: OnMount = (editor, monaco) => {
+    editorInstanceRef.current = editor
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
       flushSave().catch((err) => setError(String(err?.message ?? err)))
     })

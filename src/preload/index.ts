@@ -14,7 +14,10 @@ import type {
   PtyCreateOptions,
   PtyDataPayload,
   PtyExitPayload,
-  PtyKind
+  PtyKind,
+  QuikContentMatch,
+  QuikContentMode,
+  QuikFileEntry
 } from '@shared/types'
 
 // 터미널 세션 최대 20개 × 채널 2개 = 40 리스너가 상한.
@@ -37,6 +40,15 @@ const api = {
     ipcRenderer.invoke(IpcChannel.DialogPickFolder, defaultPath),
   createFolder: (name: string): Promise<string> =>
     ipcRenderer.invoke(IpcChannel.FolderCreate, name),
+  quik: {
+    listFiles: (): Promise<QuikFileEntry[]> =>
+      ipcRenderer.invoke(IpcChannel.QuikListFiles),
+    searchContent: (
+      query: string,
+      mode: QuikContentMode
+    ): Promise<QuikContentMatch[]> =>
+      ipcRenderer.invoke(IpcChannel.QuikSearchContent, query, mode)
+  },
   memo: {
     load: (projectPath: string): Promise<string | null> =>
       ipcRenderer.invoke(IpcChannel.MemoLoad, projectPath),
