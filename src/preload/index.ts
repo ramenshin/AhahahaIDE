@@ -13,7 +13,8 @@ import type {
   FsChangeEvent,
   PtyCreateOptions,
   PtyDataPayload,
-  PtyExitPayload
+  PtyExitPayload,
+  PtyKind
 } from '@shared/types'
 
 // 터미널 세션 최대 20개 × 채널 2개 = 40 리스너가 상한.
@@ -59,6 +60,12 @@ const api = {
     write: (ptyId: string, data: string): void => {
       ipcRenderer.send(IpcChannel.PtyWrite, ptyId, data)
     },
+    writeByFolder: (
+      folderPath: string,
+      kind: PtyKind,
+      data: string
+    ): Promise<boolean> =>
+      ipcRenderer.invoke(IpcChannel.PtyWriteByFolder, folderPath, kind, data),
     resize: (ptyId: string, cols: number, rows: number): void => {
       ipcRenderer.send(IpcChannel.PtyResize, ptyId, cols, rows)
     },

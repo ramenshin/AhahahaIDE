@@ -1,9 +1,15 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { IpcChannel } from '@shared/ipc-channels'
-import type { AppConfig, PtyCreateOptions } from '@shared/types'
+import type { AppConfig, PtyCreateOptions, PtyKind } from '@shared/types'
 import { scanProjectFolders } from './folder-scanner'
 import { loadConfig, saveConfig } from './state-store'
-import { closePty, createPty, resizePty, writePty } from './pty-manager'
+import {
+  closePty,
+  createPty,
+  resizePty,
+  writePty,
+  writePtyByFolder
+} from './pty-manager'
 import { startWatch, stopWatch } from './file-watcher'
 import { loadMemo, saveMemo } from './memo-store'
 import { readTextFile, writeTextFile } from './file-store'
@@ -45,6 +51,13 @@ export function registerIpcHandlers(): void {
   ipcMain.on(IpcChannel.PtyWrite, (_event, ptyId: string, data: string) => {
     writePty(ptyId, data)
   })
+
+  ipcMain.handle(
+    IpcChannel.PtyWriteByFolder,
+    (_event, folderPath: string, kind: PtyKind, data: string): boolean => {
+      return writePtyByFolder(folderPath, kind, data)
+    }
+  )
 
   ipcMain.on(
     IpcChannel.PtyResize,

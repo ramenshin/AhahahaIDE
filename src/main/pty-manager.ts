@@ -66,6 +66,22 @@ export function writePty(id: string, data: string): void {
   ptyMap.get(id)?.proc.write(data)
 }
 
+// folderPath + kind로 PTY를 찾아 write. 매칭되는 첫 항목에만 전송.
+// 반환: 매칭돼 전송했으면 true, 없으면 false.
+export function writePtyByFolder(
+  folderPath: string,
+  kind: PtyKind,
+  data: string
+): boolean {
+  for (const entry of ptyMap.values()) {
+    if (entry.folderPath === folderPath && entry.kind === kind) {
+      entry.proc.write(data)
+      return true
+    }
+  }
+  return false
+}
+
 export function resizePty(id: string, cols: number, rows: number): void {
   const entry = ptyMap.get(id)
   if (!entry) return

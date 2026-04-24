@@ -1,6 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import Editor, { type OnMount } from '@monaco-editor/react'
 import '../monaco-setup'
+
+export interface EditorFlushHandle {
+  flush: () => Promise<void>
+}
 
 interface Props {
   projectRoot: string
@@ -52,7 +56,10 @@ function fileNameOf(p: string): string {
   return p.split(/[\\/]/).pop() ?? p
 }
 
-export function CodeEditor({ projectRoot, filePath, onDirtyChange }: Props) {
+export const CodeEditor = forwardRef<EditorFlushHandle, Props>(function CodeEditor(
+  { projectRoot, filePath, onDirtyChange },
+  ref
+) {
   const [content, setContent] = useState<string>('')
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -116,6 +123,15 @@ export function CodeEditor({ projectRoot, filePath, onDirtyChange }: Props) {
     }
   }, [])
 
+  // 외부에서 호출 가능한 flush. App의 "상태저장" 버튼이 사용.
+  useImperativeHandle(
+    ref,
+    () => ({
+      flush: () => flushSaveRef.current()
+    }),
+    []
+  )
+
   useEffect(() => {
     if (!loaded) return
     const dirty = content !== savedContentRef.current
@@ -161,4 +177,4 @@ export function CodeEditor({ projectRoot, filePath, onDirtyChange }: Props) {
       />
     </div>
   )
-}
+})

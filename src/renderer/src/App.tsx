@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import type { AppConfig, LayoutMode, ProjectFolder } from '@shared/types'
-import { ZOOM_STEP, clampZoom } from '@shared/types'
-import { TopBar } from './components/TopBar'
+import { CLAUDE_SAVE_STATE_PROMPT, ZOOM_STEP, clampZoom } from '@shared/types'
+import { TopBar, type SaveStateScope } from './components/TopBar'
 import { ProjectTabBar } from './components/ProjectTabBar'
 import { ProjectTree } from './components/ProjectTree'
 import { StatusBar } from './components/StatusBar'
@@ -11,7 +11,7 @@ import { Terminal } from './components/Terminal'
 import { SettingsModal } from './components/SettingsModal'
 import { FileExplorer } from './components/FileExplorer'
 import { MemoEditor } from './components/MemoEditor'
-import { CodeEditor } from './components/CodeEditor'
+import { CodeEditor, type EditorFlushHandle } from './components/CodeEditor'
 
 function fileNameOf(p: string): string {
   return p.split(/[\\/]/).pop() ?? p
@@ -104,6 +104,9 @@ export function App() {
   const [memoDirty, setMemoDirty] = useState(false)
   const [openedFile, setOpenedFile] = useState<string | null>(null)
   const [editorDirty, setEditorDirty] = useState(false)
+  const [toast, setToast] = useState<{ text: string; kind: 'ok' | 'error' } | null>(null)
+  const codeEditorRef = useRef<EditorFlushHandle | null>(null)
+  const memoEditorRef = useRef<EditorFlushHandle | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -165,6 +168,16 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [config, applyZoom, settingsOpen])
 
+  // 토스트 자동 소멸
+  useEffect(() => {
+    if (!toast) return
+    const t = window.setTimeout(
+      () => setToast(null),
+      toast.kind === 'error' ? 5000 : 2500
+    )
+    return () => window.clearTimeout(t)
+  }, [toast])
+
   const handleSaveSettings = useCallback(
     async (next: AppConfig) => {
       const prevRootPath = config?.rootPath
@@ -187,6 +200,50 @@ export function App() {
       }
     },
     [config]
+  )
+
+  const handleSaveState = useCallback(
+    async (scope: SaveStateScope) => {
+      const targets =
+        scope === 'all' ? openPaths : activePath ? [activePath] : []
+      const scopeDesc =
+        scope === 'all'
+          ? `열린 모든 프로젝트(${openPaths.length}개)`
+          : '현재 활성 프로젝트'
+      const claudeDesc =
+        scope === 'all' ? '열린 모든' : '활성'
+      const ok = window.confirm(
+        `${scopeDesc}의 상태를 저장합니다:\n\n` +
+          '1) 활성 프로젝트의 미저장 파일(에디터·메모) 즉시 저장\n' +
+          `2) ${claudeDesc} Claude 터미널에 상태 정리 지시 전송\n\n` +
+          '계속하시겠습니까?'
+      )
+      if (!ok) return
+      try {
+        await codeEditorRef.current?.flush()
+        await memoEditorRef.current?.flush()
+        const msg = CLAUDE_SAVE_STATE_PROMPT + '\r'
+        let sent = 0
+        for (const path of targets) {
+          const delivered = await window.api.pty.writeByFolder(
+            path,
+            'claude',
+            msg
+          )
+          if (delivered) sent++
+        }
+        setToast({
+          text:
+            targets.length === 0
+              ? '파일 저장 완료 (Claude 터미널 없음)'
+              : `저장 완료 · Claude ${sent}/${targets.length}개 전송`,
+          kind: 'ok'
+        })
+      } catch (err) {
+        setToast({ text: `저장 실패: ${String(err)}`, kind: 'error' })
+      }
+    },
+    [openPaths, activePath]
   )
 
   const refreshFolders = useCallback(async () => {
@@ -287,6 +344,7 @@ export function App() {
       {activeFolder && effectiveOpenedFile ? (
         <CodeEditor
           key={effectiveOpenedFile}
+          ref={codeEditorRef}
           projectRoot={activeFolder.path}
           filePath={effectiveOpenedFile}
           onDirtyChange={setEditorDirty}
@@ -359,7 +417,12 @@ export function App() {
 
   return (
     <div className="app">
-      <TopBar onOpenSettings={() => setSettingsOpen(true)} />
+      <TopBar
+        onOpenSettings={() => setSettingsOpen(true)}
+        onSaveState={handleSaveState}
+        hasOpenProjects={openPaths.length > 0}
+        hasActiveProject={activePath !== null}
+      />
       <ProjectTabBar
         openProjects={openProjects}
         activePath={activePath}
@@ -429,6 +492,7 @@ export function App() {
                 {activeFolder ? (
                   <MemoEditor
                     key={activeFolder.path}
+                    ref={memoEditorRef}
                     projectPath={activeFolder.path}
                     onDirtyChange={setMemoDirty}
                   />
@@ -459,6 +523,11 @@ export function App() {
       {sessionError && (
         <div className="session-error" onClick={() => setSessionError(null)}>
           {sessionError} <span className="dismiss">×</span>
+        </div>
+      )}
+      {toast && (
+        <div className={`toast${toast.kind === 'error' ? ' error' : ''}`}>
+          {toast.text}
         </div>
       )}
       <StatusBar

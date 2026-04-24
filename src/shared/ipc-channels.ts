@@ -4,6 +4,7 @@ export const IpcChannel = {
   SetConfig: 'config:set',
   PtyCreate: 'pty:create',
   PtyWrite: 'pty:write',
+  PtyWriteByFolder: 'pty:write-by-folder',
   PtyResize: 'pty:resize',
   PtyClose: 'pty:close',
   PtyData: 'pty:data',
