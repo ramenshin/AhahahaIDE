@@ -129,6 +129,36 @@ body {
 .toast.error {
   border-color: #c0392b;
 }
+.modal-compact {
+  max-width: 480px;
+}
+.new-project-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text-0);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: Consolas, monospace;
+  box-sizing: border-box;
+}
+.new-project-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.new-project-input:disabled {
+  opacity: 0.6;
+}
+.new-project-error {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: rgba(192, 57, 43, 0.12);
+  border: 1px solid rgba(192, 57, 43, 0.6);
+  color: #e67e7e;
+  font-size: 12px;
+}
 
 /* === PROJECT TAB BAR === */
 .project-tabs {

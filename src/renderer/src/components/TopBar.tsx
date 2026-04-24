@@ -5,6 +5,7 @@ export type SaveStateScope = 'all' | 'active'
 interface Props {
   onOpenSettings: () => void
   onSaveState: (scope: SaveStateScope) => void
+  onCreateProject: () => void
   hasOpenProjects: boolean
   hasActiveProject: boolean
 }
@@ -12,6 +13,7 @@ interface Props {
 export function TopBar({
   onOpenSettings,
   onSaveState,
+  onCreateProject,
   hasOpenProjects,
   hasActiveProject
 }: Props) {
@@ -44,6 +46,14 @@ export function TopBar({
   return (
     <div className="top-bar">
       <div className="app-title">⚡ AhahahaIDE</div>
+      <button
+        className="btn"
+        type="button"
+        onClick={onCreateProject}
+        title="루트 폴더 아래에 새 프로젝트 폴더 생성"
+      >
+        ＋ 새 프로젝트
+      </button>
       <div className="save-state-wrap" ref={menuRef}>
         <button
           className="btn"
@@ -89,10 +99,20 @@ export function TopBar({
       </div>
       <button className="btn" type="button" onClick={onOpenSettings}>⚙ 설정</button>
       <div className="spacer" />
-      <button className="btn" type="button">
+      <button
+        className="btn"
+        type="button"
+        disabled
+        title="곧 구현 예정 (Phase 8-E)"
+      >
         Quick Switch <span className="kbd">Ctrl+P</span>
       </button>
-      <button className="btn" type="button">
+      <button
+        className="btn"
+        type="button"
+        disabled
+        title="추후 검토"
+      >
         명령 팔레트 <span className="kbd">Ctrl+Shift+P</span>
       </button>
     </div>

@@ -17,7 +17,8 @@ export const IpcChannel = {
   MemoLoad: 'memo:load',
   MemoSave: 'memo:save',
   FileRead: 'file:read',
-  FileSave: 'file:save'
+  FileSave: 'file:save',
+  FolderCreate: 'folder:create'
 } as const
 
 export type IpcChannelValue = typeof IpcChannel[keyof typeof IpcChannel]

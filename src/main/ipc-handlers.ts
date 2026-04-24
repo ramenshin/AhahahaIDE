@@ -1,3 +1,5 @@
+import { promises as fs } from 'node:fs'
+import { isAbsolute, join, relative } from 'node:path'
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { IpcChannel } from '@shared/ipc-channels'
 import type { AppConfig, PtyCreateOptions, PtyKind } from '@shared/types'
@@ -13,6 +15,34 @@ import {
 import { startWatch, stopWatch } from './file-watcher'
 import { loadMemo, saveMemo } from './memo-store'
 import { readTextFile, writeTextFile } from './file-store'
+
+// Windows 금지 문자 + 제어 문자 + 경로 구분자. 이름이 이미 trim된 상태라고 가정.
+const INVALID_FOLDER_NAME_RE = /[<>:"/\\|?*\x00-\x1f]/
+
+async function createProjectFolder(name: string): Promise<string> {
+  const trimmed = name.trim()
+  if (!trimmed) throw new Error('폴더 이름을 입력하세요.')
+  if (INVALID_FOLDER_NAME_RE.test(trimmed)) {
+    throw new Error('사용할 수 없는 문자가 포함돼 있습니다: < > : " / \\ | ? *')
+  }
+  if (trimmed === '.' || trimmed === '..') {
+    throw new Error('사용할 수 없는 이름입니다.')
+  }
+  const config = await loadConfig()
+  const target = join(config.rootPath, trimmed)
+  const rel = relative(config.rootPath, target)
+  if (rel.startsWith('..') || isAbsolute(rel)) {
+    throw new Error('루트 폴더 밖으로 나갈 수 없습니다.')
+  }
+  try {
+    await fs.mkdir(target, { recursive: false })
+  } catch (err) {
+    const e = err as NodeJS.ErrnoException
+    if (e.code === 'EEXIST') throw new Error('같은 이름의 폴더가 이미 존재합니다.')
+    throw err
+  }
+  return target
+}
 
 export function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannel.ScanFolders, async () => {
@@ -118,6 +148,13 @@ export function registerIpcHandlers(): void {
     IpcChannel.FileSave,
     async (_event, projectRoot: string, filePath: string, content: string) => {
       await writeTextFile(projectRoot, filePath, content)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannel.FolderCreate,
+    async (_event, name: string): Promise<string> => {
+      return createProjectFolder(name)
     }
   )
 

@@ -12,6 +12,7 @@ import { SettingsModal } from './components/SettingsModal'
 import { FileExplorer } from './components/FileExplorer'
 import { MemoEditor } from './components/MemoEditor'
 import { CodeEditor, type EditorFlushHandle } from './components/CodeEditor'
+import { NewProjectModal } from './components/NewProjectModal'
 
 function fileNameOf(p: string): string {
   return p.split(/[\\/]/).pop() ?? p
@@ -101,6 +102,7 @@ export function App() {
   const [activePath, setActivePath] = useState<string | null>(null)
   const [sessionError, setSessionError] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [newProjectOpen, setNewProjectOpen] = useState(false)
   const [memoDirty, setMemoDirty] = useState(false)
   const [openedFile, setOpenedFile] = useState<string | null>(null)
   const [editorDirty, setEditorDirty] = useState(false)
@@ -222,15 +224,22 @@ export function App() {
       try {
         await codeEditorRef.current?.flush()
         await memoEditorRef.current?.flush()
-        const msg = CLAUDE_SAVE_STATE_PROMPT + '\r'
+        // Claude Code의 Ink TUI는 텍스트와 Enter를 같은 write에 묶어 보내면
+        // Enter가 submit으로 처리되지 않는다. 텍스트 먼저 쓰고 짧은 지연 후
+        // \r 단독 전송으로 키 입력 이벤트를 분리.
+        const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
         let sent = 0
         for (const path of targets) {
           const delivered = await window.api.pty.writeByFolder(
             path,
             'claude',
-            msg
+            CLAUDE_SAVE_STATE_PROMPT
           )
-          if (delivered) sent++
+          if (delivered) {
+            await delay(120)
+            await window.api.pty.writeByFolder(path, 'claude', '\r')
+            sent++
+          }
         }
         setToast({
           text:
@@ -420,6 +429,7 @@ export function App() {
       <TopBar
         onOpenSettings={() => setSettingsOpen(true)}
         onSaveState={handleSaveState}
+        onCreateProject={() => setNewProjectOpen(true)}
         hasOpenProjects={openPaths.length > 0}
         hasActiveProject={activePath !== null}
       />
@@ -536,6 +546,20 @@ export function App() {
         rootPath={config?.rootPath ?? ''}
         activeFolderName={activeFolder?.name ?? null}
       />
+      {newProjectOpen && config && (
+        <NewProjectModal
+          rootPath={config.rootPath}
+          onClose={() => setNewProjectOpen(false)}
+          onCreated={async (createdPath) => {
+            setNewProjectOpen(false)
+            await refreshFolders()
+            setToast({
+              text: `새 프로젝트 생성: ${createdPath.split(/[\\/]/).pop()}`,
+              kind: 'ok'
+            })
+          }}
+        />
+      )}
       {settingsOpen && config && (
         <SettingsModal
           config={config}
