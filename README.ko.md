@@ -1,5 +1,6 @@
 # AhahahaIDE
 
+[![CI](https://github.com/ramenshin/AhahahaIDE/actions/workflows/ci.yml/badge.svg)](https://github.com/ramenshin/AhahahaIDE/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)](#지원-플랫폼)
 [![Status](https://img.shields.io/badge/status-alpha-orange)](.)
