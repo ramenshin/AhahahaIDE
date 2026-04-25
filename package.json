@@ -1,10 +1,26 @@
 {
   "name": "ahahahaide",
   "version": "0.1.0",
-  "description": "AhahahaIDE — IDE-style dev environment tool for multi-project Claude Code + PowerShell workflows",
+  "description": "A personal Windows IDE for multi-project Claude Code + PowerShell workflows",
+  "keywords": [
+    "electron",
+    "ide",
+    "claude-code",
+    "monaco",
+    "windows",
+    "developer-tools"
+  ],
   "author": "ramenshin",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
+  "homepage": "https://github.com/ramenshin/AhahahaIDE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ramenshin/AhahahaIDE.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ramenshin/AhahahaIDE/issues"
+  },
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -14,8 +30,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "pack": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder",
-    "dist:portable": "npm run build && electron-builder --win portable"
+    "dist": "npm run build && electron-builder"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
