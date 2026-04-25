@@ -11,7 +11,7 @@
     "developer-tools"
   ],
   "author": "ramenshin",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "private": true,
   "homepage": "https://github.com/ramenshin/AhahahaIDE",
   "repository": {

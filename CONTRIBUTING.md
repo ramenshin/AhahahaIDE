@@ -96,4 +96,7 @@ PRs may sit idle if the maintainer is busy. Please be patient or follow up after
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing, you agree that your contributions will be licensed under the
+[GNU General Public License v3.0 or later](LICENSE), the same license as the
+project itself. This is a copyleft license — derivative works distributed must
+also be GPL-licensed.

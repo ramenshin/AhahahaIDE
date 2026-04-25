@@ -1,7 +1,7 @@
 # AhahahaIDE
 
 [![CI](https://github.com/ramenshin/AhahahaIDE/actions/workflows/ci.yml/badge.svg)](https://github.com/ramenshin/AhahahaIDE/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)](#platform-support)
 [![Status](https://img.shields.io/badge/status-alpha-orange)](.)
 
@@ -104,4 +104,10 @@ This is **alpha-quality software**. Backups of important work are recommended.
 
 ## License
 
-[MIT](LICENSE) © 2026 ramenshin
+AhahahaIDE is licensed under the **[GNU General Public License v3.0 or later](LICENSE)**.
+
+This is a copyleft license: you are free to use, modify, and redistribute this
+software, but any derivative works you distribute must also be licensed under
+the GPL-3.0 (or later). See [LICENSE](LICENSE) for the full text.
+
+Copyright © 2026 ramenshin
