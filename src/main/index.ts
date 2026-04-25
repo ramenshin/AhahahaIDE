@@ -1,8 +1,46 @@
 import { app, BrowserWindow, dialog, shell } from 'electron'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { renameSync, statSync } from 'node:fs'
 import { registerIpcHandlers } from './ipc-handlers'
 import { closeAllPtys } from './pty-manager'
 import { stopWatch } from './file-watcher'
+
+// userData 폴더명을 'ahahahaide'(npm 소문자) → 'AhahahaIDE'(브랜드 케이스)로 통일.
+// app.whenReady() **이전**에 호출해야 app.getPath('userData')가 새 이름으로 평가됨.
+app.setName('AhahahaIDE')
+
+// 1회성 마이그레이션: 옛 'ahahahaide' 폴더가 있고 새 'AhahahaIDE'가 없으면 rename.
+// 9-A까지 사용한 사용자가 마법사를 다시 보지 않도록.
+function migrateUserDataFolder(): void {
+  const newPath = app.getPath('userData') // .../AhahahaIDE
+  const parent = dirname(newPath)
+  const oldPath = join(parent, 'ahahahaide')
+
+  // 새 폴더 이미 있으면 마이그레이션 X
+  try {
+    statSync(newPath)
+    return
+  } catch {
+    /* 새 폴더 없음 — 계속 */
+  }
+
+  // 옛 폴더 없으면 신규 사용자 — 마법사로 진행
+  try {
+    statSync(oldPath)
+  } catch {
+    return
+  }
+
+  // 옛 → 새 rename 시도
+  try {
+    renameSync(oldPath, newPath)
+    console.log(`[main] migrated userData: ${oldPath} → ${newPath}`)
+  } catch (err) {
+    // 옛 폴더가 잠겨 있거나 권한 문제 — 새 폴더로 시작 (마법사 표시될 수 있음)
+    console.warn('[main] failed to migrate userData folder:', err)
+  }
+}
+migrateUserDataFolder()
 
 const isDev = !app.isPackaged
 

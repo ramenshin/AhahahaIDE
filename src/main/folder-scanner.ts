@@ -34,7 +34,7 @@ export async function scanProjectFolders(
         path: folderPath,
         hasVenv: childSet.has('venv') || childSet.has('.venv'),
         hasGit: childSet.has('.git'),
-        hasDevIdeToolConfig: childSet.has('.devidetool.json'),
+        hasAhahahaConfig: childSet.has('.ahahaha.json'),
         modifiedAt: stat.mtimeMs
       })
     } catch (err) {

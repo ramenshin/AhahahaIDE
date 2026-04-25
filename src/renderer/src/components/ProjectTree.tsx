@@ -70,7 +70,7 @@ export function ProjectTree({
                     />
                     <span className="name">{f.name}</span>
                     {f.hasVenv && <span className="tag" title="Python venv 감지됨">venv</span>}
-                    {f.hasDevIdeToolConfig && <span className="tag" title="프로젝트 설정 파일 있음">cfg</span>}
+                    {f.hasAhahahaConfig && <span className="tag" title="프로젝트 설정 파일 있음">cfg</span>}
                   </div>
                 )
               })}

@@ -124,6 +124,6 @@ const api = {
   }
 }
 
-export type DevIdeToolApi = typeof api
+export type AhahahaApi = typeof api
 
 contextBridge.exposeInMainWorld('api', api)

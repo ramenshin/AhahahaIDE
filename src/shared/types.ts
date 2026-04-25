@@ -3,7 +3,7 @@ export interface ProjectFolder {
   path: string
   hasVenv: boolean
   hasGit: boolean
-  hasDevIdeToolConfig: boolean
+  hasAhahahaConfig: boolean
   modifiedAt: number
 }
 
