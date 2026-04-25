@@ -14,8 +14,26 @@ import {
 
 const CONFIG_FILENAME = 'config.json'
 
+// 공개 배포 대비 3-tier 분기 (Option C 강화판).
+// 1) PORTABLE_EXECUTABLE_DIR — electron-builder portable 빌드 시 자동 주입.
+//    portable.exe 가 있는 폴더에 config.json 저장 → 폴더째 USB로 옮기면 같이 따라감.
+// 2) AHAHAHAIDE_CONFIG_DIR — 명시적 환경변수 오버라이드. CI·테스트·고급 사용자용.
+// 3) userData — OS 표준 (Windows %APPDATA%, macOS ~/Library/Application Support,
+//    Linux ~/.config). 일반 사용자 기본 위치 — 멀티 OS 사용자·프라이버시 안전.
+let cachedConfigDir: string | null = null
+function getConfigDir(): string {
+  if (cachedConfigDir) return cachedConfigDir
+  const portable = process.env.PORTABLE_EXECUTABLE_DIR
+  const override = process.env.AHAHAHAIDE_CONFIG_DIR
+  const dir = portable || override || app.getPath('userData')
+  const tier = portable ? 'portable' : override ? 'override' : 'userData'
+  console.log(`[state-store] config dir = ${dir} (${tier})`)
+  cachedConfigDir = dir
+  return dir
+}
+
 function getConfigPath(): string {
-  return join(app.getPath('userData'), CONFIG_FILENAME)
+  return join(getConfigDir(), CONFIG_FILENAME)
 }
 
 // 스키마 v1(flat panels) → v2(layouts 중첩 + layoutMode) 호환용 shape
