@@ -19,6 +19,9 @@ export const IpcChannel = {
   FileRead: 'file:read',
   FileSave: 'file:save',
   FolderCreate: 'folder:create',
+  FsDirExists: 'fs:dir-exists',
+  FsMkdir: 'fs:mkdir',
+  AppDefaultRootSuggestion: 'app:default-root-suggestion',
   QuikListFiles: 'quik:list-files',
   QuikSearchContent: 'quik:search-content'
 } as const

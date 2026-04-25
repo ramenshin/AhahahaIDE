@@ -154,7 +154,8 @@ export const DEFAULT_LAYOUT_SIZES: LayoutSizes = {
 
 export const DEFAULT_CONFIG: AppConfig = {
   schemaVersion: CONFIG_SCHEMA_VERSION,
-  rootPath: 'D:\\Projects',
+  // 빈 문자열 = 첫 실행 마법사가 채울 신호. 마법사 완료 전에는 메인 UI 안 뜸.
+  rootPath: '',
   excludePatterns: ['venv', 'node_modules', '.git', '__pycache__', '.pytest_cache', '.vite', 'dist', 'out', 'build'],
   maxSessions: 5,
   startupMode: 'restore',

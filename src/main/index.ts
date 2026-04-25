@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, dialog, shell } from 'electron'
 import { join } from 'node:path'
 import { registerIpcHandlers } from './ipc-handlers'
 import { closeAllPtys } from './pty-manager'
@@ -54,6 +54,18 @@ function createMainWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
+  // Windows-only 정책. 다른 OS에서는 명시적으로 막음 — README와 일관.
+  if (process.platform !== 'win32') {
+    dialog.showErrorBox(
+      'Unsupported Platform',
+      'AhahahaIDE currently supports Windows 10/11 only.\n' +
+        'macOS and Linux support is not yet available.\n\n' +
+        'Track or contribute: https://github.com/ramenshin/AhahahaIDE'
+    )
+    app.quit()
+    return
+  }
+
   registerIpcHandlers()
   createMainWindow()
 

@@ -13,6 +13,7 @@ import { FileExplorer } from './components/FileExplorer'
 import { MemoEditor } from './components/MemoEditor'
 import { CodeEditor, type EditorFlushHandle } from './components/CodeEditor'
 import { NewProjectModal } from './components/NewProjectModal'
+import { FirstLaunchModal } from './components/FirstLaunchModal'
 import {
   QuikSearchModal,
   type QuikSearchMode,
@@ -121,16 +122,18 @@ export function App() {
     let cancelled = false
     const load = async () => {
       try {
-        const [cfg, scan] = await Promise.all([
-          window.api.getConfig(),
-          window.api.scanFolders()
-        ])
+        const cfg = await window.api.getConfig()
         if (cancelled) return
         setConfig(cfg)
         setInitialLayoutMode(cfg.ui.layoutMode)
         document.body.className = `scheme-${cfg.ui.colorScheme}`
         window.api.setZoom(cfg.ui.zoomFactor)
-        setFolders(scan.folders)
+        // 첫 실행(rootPath 빈 문자열)이면 scanFolders 보류 — 마법사 완료 후 실행
+        if (cfg.rootPath) {
+          const scan = await window.api.scanFolders()
+          if (cancelled) return
+          setFolders(scan.folders)
+        }
       } catch (err) {
         if (!cancelled) setScanError(String(err))
       } finally {
@@ -142,6 +145,23 @@ export function App() {
       cancelled = true
     }
   }, [])
+
+  // 첫 실행 마법사 완료 핸들러 — config 저장 + 폴더 스캔 + 정상 진입
+  const handleFirstLaunchComplete = useCallback(
+    async (chosenRootPath: string) => {
+      if (!config) return
+      const next: AppConfig = { ...config, rootPath: chosenRootPath }
+      try {
+        const saved = await window.api.setConfig(next)
+        setConfig(saved)
+        const scan = await window.api.scanFolders()
+        setFolders(scan.folders)
+      } catch (err) {
+        setScanError(String(err))
+      }
+    },
+    [config]
+  )
 
   const applyZoom = useCallback(
     async (nextFactor: number) => {
@@ -494,6 +514,18 @@ export function App() {
       )}
     </div>
   )
+
+  // 첫 실행: 마법사가 끝날 때까지 메인 UI 진입 차단
+  if (!loading && config && !config.rootPath) {
+    return (
+      <div className="app">
+        <FirstLaunchModal
+          onComplete={handleFirstLaunchComplete}
+          onCancel={() => window.close()}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="app">

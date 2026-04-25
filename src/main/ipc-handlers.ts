@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
-import { BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 import { IpcChannel } from '@shared/ipc-channels'
 import type {
   AppConfig,
@@ -161,6 +161,47 @@ export function registerIpcHandlers(): void {
     IpcChannel.FolderCreate,
     async (_event, name: string): Promise<string> => {
       return createProjectFolder(name)
+    }
+  )
+
+  // 첫 실행 마법사 기본 제안값: 사용자 홈 + "Projects".
+  ipcMain.handle(IpcChannel.AppDefaultRootSuggestion, (): string => {
+    return join(app.getPath('home'), 'Projects')
+  })
+
+  // 첫 실행 마법사용. 절대 경로의 디렉토리가 존재하는지 확인.
+  ipcMain.handle(
+    IpcChannel.FsDirExists,
+    async (_event, absPath: string): Promise<boolean> => {
+      if (!absPath || !isAbsolute(absPath)) return false
+      try {
+        const stat = await fs.stat(absPath)
+        return stat.isDirectory()
+      } catch {
+        return false
+      }
+    }
+  )
+
+  // 첫 실행 마법사용. 절대 경로에 mkdir-recursive. 안전 가드 최소.
+  ipcMain.handle(
+    IpcChannel.FsMkdir,
+    async (_event, absPath: string): Promise<void> => {
+      if (!absPath || !isAbsolute(absPath)) {
+        throw new Error('absolute path required')
+      }
+      // Windows 시스템 경로 보호 (대표적 경로만).
+      const lower = absPath.toLowerCase().replace(/\\/g, '/')
+      const blocked = [
+        'c:/windows',
+        'c:/program files',
+        'c:/program files (x86)',
+        'c:/programdata'
+      ]
+      if (blocked.some((p) => lower === p || lower.startsWith(p + '/'))) {
+        throw new Error('refusing to create folder under a system path')
+      }
+      await fs.mkdir(absPath, { recursive: true })
     }
   )
 

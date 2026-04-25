@@ -40,6 +40,8 @@ const api = {
     ipcRenderer.invoke(IpcChannel.DialogPickFolder, defaultPath),
   createFolder: (name: string): Promise<string> =>
     ipcRenderer.invoke(IpcChannel.FolderCreate, name),
+  defaultRootSuggestion: (): Promise<string> =>
+    ipcRenderer.invoke(IpcChannel.AppDefaultRootSuggestion),
   quik: {
     listFiles: (): Promise<QuikFileEntry[]> =>
       ipcRenderer.invoke(IpcChannel.QuikListFiles),
@@ -103,6 +105,10 @@ const api = {
     watch: (rootPath: string): Promise<FileTreeSnapshot> =>
       ipcRenderer.invoke(IpcChannel.FsWatch, rootPath),
     unwatch: (): Promise<void> => ipcRenderer.invoke(IpcChannel.FsUnwatch),
+    dirExists: (absPath: string): Promise<boolean> =>
+      ipcRenderer.invoke(IpcChannel.FsDirExists, absPath),
+    mkdir: (absPath: string): Promise<void> =>
+      ipcRenderer.invoke(IpcChannel.FsMkdir, absPath),
     onChange: (cb: (ev: FsChangeEvent) => void): (() => void) => {
       const listener = (_ev: IpcRendererEvent, payload: FsChangeEvent) =>
         cb(payload)
