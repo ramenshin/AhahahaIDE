@@ -63,6 +63,8 @@ function createMainWindow(): BrowserWindow {
     show: false,
     autoHideMenuBar: true,
     title: 'AhahahaIDE',
+    // 타이틀바 제거. TopBar의 한 줄을 드래그 영역으로 활용 + min/max/close 버튼 추가.
+    frame: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -74,6 +76,15 @@ function createMainWindow(): BrowserWindow {
   win.once('ready-to-show', () => {
     win.show()
   })
+
+  // 렌더러의 max/restore 토글 아이콘 동기화용
+  const sendMaximized = () => {
+    if (!win.isDestroyed()) {
+      win.webContents.send('window:maximized-changed', win.isMaximized())
+    }
+  }
+  win.on('maximize', sendMaximized)
+  win.on('unmaximize', sendMaximized)
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)

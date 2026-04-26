@@ -22,6 +22,10 @@ export const IpcChannel = {
   FsDirExists: 'fs:dir-exists',
   FsMkdir: 'fs:mkdir',
   AppDefaultRootSuggestion: 'app:default-root-suggestion',
+  WindowMinimize: 'window:minimize',
+  WindowToggleMaximize: 'window:toggle-maximize',
+  WindowClose: 'window:close',
+  WindowMaximizedChanged: 'window:maximized-changed',
   QuikListFiles: 'quik:list-files',
   QuikSearchContent: 'quik:search-content'
 } as const

@@ -169,6 +169,20 @@ export function registerIpcHandlers(): void {
     return join(app.getPath('home'), 'Projects')
   })
 
+  // frameless 윈도우 컨트롤 (TopBar의 min/max/close 버튼이 호출)
+  ipcMain.on(IpcChannel.WindowMinimize, (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.minimize()
+  })
+  ipcMain.on(IpcChannel.WindowToggleMaximize, (event) => {
+    const w = BrowserWindow.fromWebContents(event.sender)
+    if (!w) return
+    if (w.isMaximized()) w.unmaximize()
+    else w.maximize()
+  })
+  ipcMain.on(IpcChannel.WindowClose, (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close()
+  })
+
   // 첫 실행 마법사용. 절대 경로의 디렉토리가 존재하는지 확인.
   ipcMain.handle(
     IpcChannel.FsDirExists,

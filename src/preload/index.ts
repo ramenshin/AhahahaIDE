@@ -42,6 +42,16 @@ const api = {
     ipcRenderer.invoke(IpcChannel.FolderCreate, name),
   defaultRootSuggestion: (): Promise<string> =>
     ipcRenderer.invoke(IpcChannel.AppDefaultRootSuggestion),
+  window: {
+    minimize: (): void => ipcRenderer.send(IpcChannel.WindowMinimize),
+    toggleMaximize: (): void => ipcRenderer.send(IpcChannel.WindowToggleMaximize),
+    close: (): void => ipcRenderer.send(IpcChannel.WindowClose),
+    onMaximizedChanged: (cb: (maximized: boolean) => void): (() => void) => {
+      const listener = (_ev: IpcRendererEvent, maximized: boolean) => cb(maximized)
+      ipcRenderer.on(IpcChannel.WindowMaximizedChanged, listener)
+      return () => ipcRenderer.off(IpcChannel.WindowMaximizedChanged, listener)
+    }
+  },
   quik: {
     listFiles: (): Promise<QuikFileEntry[]> =>
       ipcRenderer.invoke(IpcChannel.QuikListFiles),

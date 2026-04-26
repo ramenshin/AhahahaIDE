@@ -20,7 +20,13 @@ export function TopBar({
   hasActiveProject
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [maximized, setMaximized] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const dispose = window.api.window.onMaximizedChanged(setMaximized)
+    return () => dispose()
+  }, [])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -117,6 +123,35 @@ export function TopBar({
       >
         명령 팔레트 <span className="kbd">Ctrl+Shift+P</span>
       </button>
+      <div className="window-controls">
+        <button
+          className="window-control"
+          type="button"
+          aria-label="최소화"
+          title="최소화"
+          onClick={() => window.api.window.minimize()}
+        >
+          ─
+        </button>
+        <button
+          className="window-control"
+          type="button"
+          aria-label={maximized ? '복원' : '최대화'}
+          title={maximized ? '복원' : '최대화'}
+          onClick={() => window.api.window.toggleMaximize()}
+        >
+          {maximized ? '❐' : '☐'}
+        </button>
+        <button
+          className="window-control window-control-close"
+          type="button"
+          aria-label="닫기"
+          title="닫기"
+          onClick={() => window.api.window.close()}
+        >
+          ✕
+        </button>
+      </div>
     </div>
   )
 }

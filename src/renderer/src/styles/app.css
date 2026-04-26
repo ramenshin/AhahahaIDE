@@ -22,8 +22,17 @@ body {
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 0 0 12px;
   gap: 8px;
+  /* frameless 윈도우의 드래그 영역. 버튼/메뉴 영역은 자체적으로 no-drag로 해제. */
+  -webkit-app-region: drag;
+}
+.top-bar button,
+.top-bar .save-state-wrap,
+.top-bar .window-controls,
+.top-bar input,
+.top-bar select {
+  -webkit-app-region: no-drag;
 }
 .top-bar .app-title {
   font-weight: 600;
@@ -56,6 +65,42 @@ body {
   color: var(--text-2);
   cursor: not-allowed;
   opacity: 0.6;
+}
+.window-controls {
+  display: flex;
+  margin-left: 4px;
+  height: 100%;
+}
+.window-control {
+  width: 46px;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-1);
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe MDL2 Assets', system-ui, sans-serif;
+}
+.window-control:hover {
+  background: var(--bg-hover);
+  color: var(--text-0);
+}
+.window-control-close:hover {
+  background: #c0392b;
+  color: #fff;
+}
+.terminal-mount-error {
+  padding: 16px;
+  color: #e67e7e;
+  background: #000;
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  height: 100%;
+  box-sizing: border-box;
 }
 .top-bar .btn:disabled:hover {
   background: transparent;
