@@ -5,11 +5,11 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)](#platform-support)
 [![Status](https://img.shields.io/badge/status-alpha-orange)](.)
 
-A personal IDE for multi-project [Claude Code](https://docs.claude.com/en/docs/claude-code) workflows. **Built for Windows.**
+An IDE for vibe-coding across multiple [Claude Code](https://docs.claude.com/en/docs/claude-code) projects in parallel. **Built for Windows.**
 
 > 🇰🇷 [한국어 README](README.ko.md)
 
-AhahahaIDE wraps the Claude CLI and PowerShell sessions into a single Electron-based IDE: file tree, Monaco editor, project memo, multi-project tabs, fuzzy file/content search (QuikSearch), and one-click "save state" across editors and Claude sessions.
+Each project (folder) you click opens an independent set of **{Claude Code, PowerShell, memo, text editor}** that stays active, so you can hop between many projects without losing context. On top of that: multi-project tabs, fuzzy file/content search (QuikSearch), and one-click "save state" that flushes editors and checkpoints Claude sessions.
 
 ## Screenshots
 

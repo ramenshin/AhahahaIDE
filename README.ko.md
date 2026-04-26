@@ -5,11 +5,11 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue)](#지원-플랫폼)
 [![Status](https://img.shields.io/badge/status-alpha-orange)](.)
 
-여러 프로젝트에서 [Claude Code](https://docs.claude.com/en/docs/claude-code) 작업 흐름을 함께 다루기 위한 개인용 IDE. **Windows 전용.**
+[Claude Code](https://docs.claude.com/en/docs/claude-code)로 여러 프로젝트(폴더)를 동시에 열어두고 바이브 코딩 작업하기 편리한 IDE. **Windows 전용.**
 
 > 🇬🇧 [English README](README.md)
 
-AhahahaIDE는 Claude CLI와 PowerShell 세션을 하나의 Electron 기반 IDE로 묶어줍니다: 파일 트리, Monaco 에디터, 프로젝트 메모, 멀티 프로젝트 탭, 퍼지 파일·내용 검색(QuikSearch), 그리고 에디터·Claude 세션 전체를 한 번에 저장하는 "상태저장" 기능.
+클릭하는 프로젝트(폴더)마다 독립된 세트 **{Claude Code, PowerShell, 메모장, 텍스트 에디터}** 가 열려서 활성 상태로 유지되고, 여러 프로젝트를 열어두고 자유롭게 오가며 작업할 수 있습니다. 여기에 멀티 프로젝트 탭, 퍼지 파일·내용 검색(QuikSearch), 에디터·Claude 세션 전체를 한 번에 저장하는 "상태저장" 기능을 더했습니다.
 
 ## 스크린샷
 
