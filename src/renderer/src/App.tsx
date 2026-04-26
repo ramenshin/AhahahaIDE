@@ -451,7 +451,6 @@ export function App() {
         />
       ) : (
         <Placeholder
-          phase="Phase 7"
           title="Monaco 코드 에디터"
           description={
             activeFolder
@@ -470,7 +469,6 @@ export function App() {
       </div>
       {openPaths.length === 0 ? (
         <Placeholder
-          phase="Phase 2"
           title="Claude 터미널"
           description="좌측에서 프로젝트 폴더를 클릭하면 PowerShell + Claude가 실행됩니다."
         />
@@ -496,7 +494,6 @@ export function App() {
       </div>
       {openPaths.length === 0 ? (
         <Placeholder
-          phase="Phase 2"
           title="일반 터미널"
           description="프로젝트를 열면 venv 활성화된 PowerShell이 실행됩니다."
         />
@@ -583,7 +580,6 @@ export function App() {
                       />
                     ) : (
                       <Placeholder
-                        phase="Phase 3"
                         title="파일 탐색기"
                         description="프로젝트를 선택하면 파일 트리가 표시됩니다."
                       />
@@ -612,7 +608,6 @@ export function App() {
                   />
                 ) : (
                   <Placeholder
-                    phase="Phase 4-B"
                     title="프로젝트 메모"
                     description="프로젝트를 선택하면 user_defined_memo.md 파일이 열립니다."
                   />

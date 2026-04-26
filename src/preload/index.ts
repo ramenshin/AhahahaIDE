@@ -42,6 +42,8 @@ const api = {
     ipcRenderer.invoke(IpcChannel.FolderCreate, name),
   defaultRootSuggestion: (): Promise<string> =>
     ipcRenderer.invoke(IpcChannel.AppDefaultRootSuggestion),
+  getAppVersion: (): Promise<string> =>
+    ipcRenderer.invoke(IpcChannel.AppGetVersion),
   window: {
     minimize: (): void => ipcRenderer.send(IpcChannel.WindowMinimize),
     toggleMaximize: (): void => ipcRenderer.send(IpcChannel.WindowToggleMaximize),

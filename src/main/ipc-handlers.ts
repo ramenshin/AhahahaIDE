@@ -169,6 +169,11 @@ export function registerIpcHandlers(): void {
     return join(app.getPath('home'), 'Projects')
   })
 
+  // 설정 모달의 About 섹션. package.json 의 version 자동 반영.
+  ipcMain.handle(IpcChannel.AppGetVersion, (): string => {
+    return app.getVersion()
+  })
+
   // frameless 윈도우 컨트롤 (TopBar의 min/max/close 버튼이 호출)
   ipcMain.on(IpcChannel.WindowMinimize, (event) => {
     BrowserWindow.fromWebContents(event.sender)?.minimize()

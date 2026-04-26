@@ -22,6 +22,7 @@ export const IpcChannel = {
   FsDirExists: 'fs:dir-exists',
   FsMkdir: 'fs:mkdir',
   AppDefaultRootSuggestion: 'app:default-root-suggestion',
+  AppGetVersion: 'app:get-version',
   WindowMinimize: 'window:minimize',
   WindowToggleMaximize: 'window:toggle-maximize',
   WindowClose: 'window:close',

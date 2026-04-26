@@ -20,7 +20,7 @@ export function StatusBar({ folderCount, maxSessions, rootPath, activeFolderName
         </>
       )}
       <div className="spacer" />
-      <div className="item">Phase 1 · 기본 셸</div>
+      <div className="item">AhahahaIDE</div>
     </div>
   )
 }

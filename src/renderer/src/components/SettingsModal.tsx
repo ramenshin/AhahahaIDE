@@ -54,6 +54,14 @@ export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Pr
     config.excludePatterns.join('\n')
   )
   const [saving, setSaving] = useState(false)
+  const [appVersion, setAppVersion] = useState<string>('')
+
+  useEffect(() => {
+    // 방어: preload가 새 빌드로 갱신 안 됐으면 함수가 없을 수 있음
+    const fn = window.api.getAppVersion
+    if (typeof fn !== 'function') return
+    fn().then(setAppVersion).catch(() => {})
+  }, [])
 
   useEffect(() => {
     window.api.setZoom(draftZoom)
@@ -311,6 +319,46 @@ export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Pr
                 ⚠ 저장된 레이아웃과 현재 렌더 중인 레이아웃이 다릅니다. 앱을 재시작하세요.
               </p>
             )}
+          </section>
+
+          <section className="settings-section about-section">
+            <h3 className="settings-section-title">About</h3>
+            <p className="about-message">
+              Built to manage multiple Claude Code projects more comfortably.
+              Try it out, and please email me with bug reports or feature suggestions.
+            </p>
+            <dl className="about-list">
+              <dt>Developer</dt>
+              <dd>
+                ramenshin &lt;
+                <a href="mailto:londongvmisushi@gmail.com">
+                  londongvmisushi@gmail.com
+                </a>
+                &gt;
+              </dd>
+              <dt>GitHub</dt>
+              <dd>
+                <a
+                  href="https://github.com/ramenshin/AhahahaIDE"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  github.com/ramenshin/AhahahaIDE
+                </a>
+              </dd>
+              <dt>License</dt>
+              <dd>
+                <a
+                  href="https://www.gnu.org/licenses/gpl-3.0.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  GPL-3.0-or-later
+                </a>
+              </dd>
+              <dt>Version</dt>
+              <dd>{appVersion || '...'} (2026.04)</dd>
+            </dl>
           </section>
         </div>
         <div className="modal-footer">
