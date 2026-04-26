@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { AppConfig, ColorScheme, LayoutMode } from '@shared/types'
 import { MAX_SESSIONS_LIMIT, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP, clampZoom } from '@shared/types'
+import { version as APP_VERSION } from '../../../../package.json'
 
 interface Props {
   config: AppConfig
@@ -54,14 +55,6 @@ export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Pr
     config.excludePatterns.join('\n')
   )
   const [saving, setSaving] = useState(false)
-  const [appVersion, setAppVersion] = useState<string>('')
-
-  useEffect(() => {
-    // 방어: preload가 새 빌드로 갱신 안 됐으면 함수가 없을 수 있음
-    const fn = window.api.getAppVersion
-    if (typeof fn !== 'function') return
-    fn().then(setAppVersion).catch(() => {})
-  }, [])
 
   useEffect(() => {
     window.api.setZoom(draftZoom)
@@ -331,8 +324,8 @@ export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Pr
               <dt>Developer</dt>
               <dd>
                 ramenshin &lt;
-                <a href="mailto:londongvmisushi@gmail.com">
-                  londongvmisushi@gmail.com
+                <a href="mailto:ramenshin@gmail.com">
+                  ramenshin@gmail.com
                 </a>
                 &gt;
               </dd>
@@ -357,7 +350,7 @@ export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Pr
                 </a>
               </dd>
               <dt>Version</dt>
-              <dd>{appVersion || '...'} (2026.04)</dd>
+              <dd>{APP_VERSION} (2026.04)</dd>
             </dl>
           </section>
         </div>

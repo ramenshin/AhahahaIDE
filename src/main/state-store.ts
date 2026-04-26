@@ -107,11 +107,16 @@ function mergeConfig(partial: Partial<AppConfig>): AppConfig {
   merged.ui.zoomFactor = clampZoom(merged.ui.zoomFactor)
   merged.maxSessions = clampSessions(merged.maxSessions)
 
-  // v1 → v2 일회성 마이그레이션: 기본값을 신규 디폴트로 밀어올림.
-  // 사용자가 이미 v2 이상에서 customize한 값은 보존.
-  if (priorVersion < CONFIG_SCHEMA_VERSION) {
+  // 단계별 1회성 마이그레이션. 각 버전 단계는 독립적으로 적용.
+  // v1 → v2: 기본값 상향 (maxSessions, zoomFactor)
+  if (priorVersion < 2) {
     merged.maxSessions = DEFAULT_CONFIG.maxSessions
     merged.ui.zoomFactor = DEFAULT_CONFIG.ui.zoomFactor
+  }
+  // v2 → v3: rowcol 레이아웃 비율을 50:50 → 60:40 (Claude TUI 가독성)
+  if (priorVersion < 3) {
+    merged.ui.panels.layouts.rowcol.claudeTerminalWidth =
+      DEFAULT_CONFIG.ui.panels.layouts.rowcol.claudeTerminalWidth
   }
 
   return merged

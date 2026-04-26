@@ -63,7 +63,7 @@ export interface AppConfig {
 
 export type ColorScheme = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
 
-export const CONFIG_SCHEMA_VERSION = 2
+export const CONFIG_SCHEMA_VERSION = 3
 export const MAX_SESSIONS_LIMIT = 20
 
 export const ZOOM_MIN = 0.8
@@ -148,7 +148,8 @@ export const DEFAULT_LAYOUT_SIZES: LayoutSizes = {
   },
   rowcol: {
     editorHeight: 40,
-    claudeTerminalWidth: 50
+    // Claude TUI가 좁으면 줄 정렬이 어지러워져 60% 권장 (잔여 40%는 PowerShell)
+    claudeTerminalWidth: 60
   }
 }
 
