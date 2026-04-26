@@ -11,6 +11,10 @@ A personal IDE for multi-project [Claude Code](https://docs.claude.com/en/docs/c
 
 AhahahaIDE wraps the Claude CLI and PowerShell sessions into a single Electron-based IDE: file tree, Monaco editor, project memo, multi-project tabs, fuzzy file/content search (QuikSearch), and one-click "save state" across editors and Claude sessions.
 
+## Screenshots
+
+<p align="center"><img src="docs/screenshots/AhahahaIDE_screenshot.png" width="900" alt="AhahahaIDE main view" /></p>
+
 ---
 
 ## Platform Support

@@ -11,6 +11,10 @@
 
 AhahahaIDE는 Claude CLI와 PowerShell 세션을 하나의 Electron 기반 IDE로 묶어줍니다: 파일 트리, Monaco 에디터, 프로젝트 메모, 멀티 프로젝트 탭, 퍼지 파일·내용 검색(QuikSearch), 그리고 에디터·Claude 세션 전체를 한 번에 저장하는 "상태저장" 기능.
 
+## 스크린샷
+
+<p align="center"><img src="docs/screenshots/AhahahaIDE_screenshot.png" width="900" alt="AhahahaIDE 메인 화면" /></p>
+
 ---
 
 ## 지원 플랫폼
