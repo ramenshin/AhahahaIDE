@@ -1,6 +1,6 @@
 {
   "name": "ahahahaide",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A personal Windows IDE for multi-project Claude Code + PowerShell workflows",
   "keywords": [
     "electron",
