@@ -43,6 +43,9 @@ export interface AppConfig {
     showGitBranch: boolean
     zoomFactor: number
     layoutMode: LayoutMode
+    // 터미널: 마우스로 텍스트를 드래그한 즉시 클립보드에 자동 복사할지 여부.
+    // false면 Ctrl+C(선택 있을 때) / Ctrl+Shift+C / 우클릭으로만 복사됨.
+    terminalCopyOnSelection: boolean
     panels: {
       leftWidth: number
       folderListWidth: number
@@ -165,6 +168,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     showGitBranch: true,
     zoomFactor: 1.1,
     layoutMode: 'row3',
+    terminalCopyOnSelection: true,
     panels: {
       leftWidth: 32,
       folderListWidth: 42,

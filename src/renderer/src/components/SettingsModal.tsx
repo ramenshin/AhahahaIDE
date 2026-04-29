@@ -51,6 +51,9 @@ export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Pr
   const [draftRootPath, setDraftRootPath] = useState<string>(config.rootPath)
   const [draftMaxSessions, setDraftMaxSessions] = useState<number>(config.maxSessions)
   const [draftLayoutMode, setDraftLayoutMode] = useState<LayoutMode>(config.ui.layoutMode)
+  const [draftCopyOnSelection, setDraftCopyOnSelection] = useState<boolean>(
+    config.ui.terminalCopyOnSelection
+  )
   const [excludeText, setExcludeText] = useState<string>(
     config.excludePatterns.join('\n')
   )
@@ -131,7 +134,8 @@ export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Pr
         ...config.ui,
         zoomFactor: clampZoom(draftZoom),
         colorScheme: draftScheme,
-        layoutMode: finalLayoutMode
+        layoutMode: finalLayoutMode,
+        terminalCopyOnSelection: draftCopyOnSelection
       }
     }
     try {
@@ -272,6 +276,33 @@ export function SettingsModal({ config, initialLayoutMode, onClose, onSave }: Pr
               />
               <span className="settings-hint">개</span>
             </div>
+          </section>
+
+          <section className="settings-section">
+            <h3 className="settings-section-title">터미널 · 복사/붙여넣기</h3>
+            <p className="settings-hint">
+              메모·에디터와 동일하게 <span className="kbd">Ctrl</span>{' '}
+              <span className="kbd">C</span> / <span className="kbd">Ctrl</span>{' '}
+              <span className="kbd">V</span> 사용. 터미널에서 <span className="kbd">Ctrl</span>{' '}
+              <span className="kbd">C</span> 는 <b>선택된 텍스트가 있으면 복사</b>, 없으면 셸로
+              인터럽트(SIGINT) 가 전달됩니다. 기존 <span className="kbd">Ctrl</span>{' '}
+              <span className="kbd">Shift</span> <span className="kbd">C</span> /{' '}
+              <span className="kbd">V</span> 도 그대로 사용 가능합니다.
+            </p>
+            <label className="layout-option" style={{ cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={draftCopyOnSelection}
+                onChange={(e) => setDraftCopyOnSelection(e.target.checked)}
+              />
+              <div className="layout-option-body">
+                <div className="layout-option-label">선택 시 자동 복사</div>
+                <div className="layout-option-hint">
+                  마우스로 드래그한 즉시 클립보드에 복사 (PuTTY/Linux 관례). 끄면 단축키나
+                  우클릭으로만 복사됩니다.
+                </div>
+              </div>
+            </label>
           </section>
 
           <section className="settings-section">

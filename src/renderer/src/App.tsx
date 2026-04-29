@@ -479,7 +479,11 @@ export function App() {
               key={p}
               className={`terminal-slot${p === activePath ? ' active' : ''}`}
             >
-              <Terminal folderPath={p} kind="claude" />
+              <Terminal
+                folderPath={p}
+                kind="claude"
+                copyOnSelection={config?.ui.terminalCopyOnSelection ?? true}
+              />
             </div>
           ))}
         </div>
@@ -504,7 +508,11 @@ export function App() {
               key={p}
               className={`terminal-slot${p === activePath ? ' active' : ''}`}
             >
-              <Terminal folderPath={p} kind="plain" />
+              <Terminal
+                folderPath={p}
+                kind="plain"
+                copyOnSelection={config?.ui.terminalCopyOnSelection ?? true}
+              />
             </div>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Terminal as XTerm, type ITheme } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebLinksAddon } from '@xterm/addon-web-links'
@@ -34,6 +34,8 @@ function rawDump(label: string, data: string): void {
 interface Props {
   folderPath: string
   kind: PtyKind
+  // 마우스 드래그로 선택한 즉시 클립보드에 자동 복사 (Linux/PuTTY 관례).
+  copyOnSelection: boolean
 }
 
 function readCssVar(name: string, fallback: string): string {
@@ -55,10 +57,15 @@ function buildTheme(): ITheme {
 const dbg = (msg: string, ...args: unknown[]) =>
   console.log(`[terminal] ${msg}`, ...args)
 
-export function Terminal({ folderPath, kind }: Props) {
+export function Terminal({ folderPath, kind, copyOnSelection }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   // 마운트 실패 시 사용자에게 보일 에러 (UI 먹통 방지)
   const [mountError, setMountError] = useState<string | null>(null)
+  // 토글 시 터미널을 재생성하지 않고 ref로만 동기화 (세션 유지).
+  const copyOnSelectionRef = useRef(copyOnSelection)
+  useLayoutEffect(() => {
+    copyOnSelectionRef.current = copyOnSelection
+  }, [copyOnSelection])
 
   useEffect(() => {
     const container = containerRef.current
@@ -120,27 +127,53 @@ export function Terminal({ folderPath, kind }: Props) {
     })
     ro.observe(container)
 
-    // 복사/붙여넣기 키바인딩. Ctrl+C/V를 쓰면 shell의 SIGINT/쓰기와 충돌하므로
-    // Windows Terminal 관례인 Ctrl+Shift+C/V 사용.
+    // 복사/붙여넣기 키바인딩 — VS Code 통합 터미널 방식.
+    // - Ctrl+C: 선택영역 있으면 복사+선택해제, 없으면 SIGINT(셸로 통과).
+    // - Ctrl+V / Ctrl+Shift+V: 키스트로크만 차단(false 반환). 실제 붙여넣기는
+    //   브라우저가 textarea에 자동 발화하는 paste 이벤트를 xterm 내장 핸들러가 처리.
+    //   직접 readText→pty.write 까지 호출하면 xterm 내장 paste와 겹쳐 두 번 입력됨.
+    // - Ctrl+Shift+C: 선택영역 복사 (호환용).
+    // 메모/에디터(Monaco)와 동일한 키로 통일해 패널 간 복붙 마찰 제거.
     term.attachCustomKeyEventHandler((e) => {
       if (e.type !== 'keydown') return true
       const key = e.key.toLowerCase()
-      if (e.ctrlKey && e.shiftKey && !e.altKey && key === 'c') {
+      const ctrlOnly = e.ctrlKey && !e.shiftKey && !e.altKey
+      const ctrlShift = e.ctrlKey && e.shiftKey && !e.altKey
+
+      if (ctrlOnly && key === 'c') {
         const sel = term.getSelection()
-        if (sel) navigator.clipboard.writeText(sel).catch(() => {})
+        if (sel) {
+          navigator.clipboard.writeText(sel).catch(() => {})
+          term.clearSelection()
+          return false
+        }
+        // 선택 없음 → SIGINT가 셸로 전달되도록 통과
+        return true
+      }
+      if ((ctrlOnly || ctrlShift) && key === 'v') {
+        // 브라우저 paste 이벤트가 xterm으로 흘러가도록 키 처리만 차단.
         return false
       }
-      if (e.ctrlKey && e.shiftKey && !e.altKey && key === 'v') {
-        navigator.clipboard
-          .readText()
-          .then((text) => {
-            if (ptyId && text) window.api.pty.write(ptyId, text)
-          })
-          .catch(() => {})
+      if (ctrlShift && key === 'c') {
+        const sel = term.getSelection()
+        if (sel) {
+          navigator.clipboard.writeText(sel).catch(() => {})
+          term.clearSelection()
+        }
         return false
       }
       return true
     })
+
+    // 자동 복사: 마우스 드래그(좌클릭) 종료 시 선택영역을 클립보드로.
+    // onSelectionChange는 드래그 중 매 프레임 발화하므로 mouseup에서 1회만 처리.
+    const handleMouseUp = (e: MouseEvent) => {
+      if (e.button !== 0) return
+      if (!copyOnSelectionRef.current) return
+      const sel = term.getSelection()
+      if (sel) navigator.clipboard.writeText(sel).catch(() => {})
+    }
+    container.addEventListener('mouseup', handleMouseUp)
 
     // 우클릭: 선택된 텍스트 있으면 복사, 없으면 붙여넣기 (PuTTY/Windows Terminal 관례).
     const handleContextMenu = (e: MouseEvent) => {
@@ -202,6 +235,7 @@ export function Terminal({ folderPath, kind }: Props) {
       cancelAnimationFrame(initialFitHandle)
       ro.disconnect()
       container.removeEventListener('contextmenu', handleContextMenu)
+      container.removeEventListener('mouseup', handleMouseUp)
       inputDisposable?.dispose()
       resizeDisposable?.dispose()
       disposeData?.()
